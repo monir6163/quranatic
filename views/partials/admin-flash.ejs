@@ -1,0 +1,10 @@
+<% if (typeof messages !== 'undefined' && messages.success && messages.success.length) { %>
+  <div class="mb-5 rounded-lg bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-700 ring-1 ring-primary-200">
+    <%= messages.success[0] %>
+  </div>
+<% } %>
+<% if (typeof messages !== 'undefined' && messages.error && messages.error.length) { %>
+  <div class="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-clay ring-1 ring-red-200">
+    <%= messages.error[0] %>
+  </div>
+<% } %>

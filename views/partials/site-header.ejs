@@ -1,0 +1,23 @@
+<header class="sticky top-0 z-40 border-b border-primary-900/10 bg-canvas/90 backdrop-blur-md">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
+    <a href="#top" class="flex items-center gap-2.5">
+      <% if (content.siteSettings.logo) { %>
+        <img src="<%= content.siteSettings.logo %>" alt="<%= content.siteSettings.siteName %>" class="h-9 w-9 rounded-lg object-cover" />
+      <% } else { %>
+        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600 text-lg text-gold-100">﷽</span>
+      <% } %>
+      <span class="leading-tight">
+        <span class="block font-display text-[15px] font-bold text-primary-800 sm:text-base"><%= content.siteSettings.siteName %></span>
+        <span class="hidden text-[11px] text-ink/50 sm:block"><%= content.siteSettings.tagline %></span>
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-6 text-sm font-semibold text-ink/70 md:flex">
+      <a href="#problems" class="transition hover:text-primary-700">সমস্যা</a>
+      <a href="#solution" class="transition hover:text-primary-700">সমাধান</a>
+      <a href="#faq" class="transition hover:text-primary-700">প্রশ্নোত্তর</a>
+      <a href="#testimonials" class="transition hover:text-primary-700">রিভিউ</a>
+    </nav>
+
+  </div>
+</header>

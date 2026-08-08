@@ -1,0 +1,73 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">প্রশ্নোত্তর সেকশন</h1>
+<p class="mt-1 text-sm text-ink/60">গ্রাহকদের সাধারণ প্রশ্ন ও উত্তর যোগ/মুছুন/পরিবর্তন করুন।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/faq" method="POST" class="admin-card mt-6 max-w-3xl space-y-5">
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label class="admin-label">ছোট ব্যাজ টেক্সট</label>
+      <input type="text" name="eyebrow" value="<%= content.faq.eyebrow %>" class="admin-input" />
+    </div>
+    <div>
+      <label class="admin-label">শিরোনাম</label>
+      <input type="text" name="heading" value="<%= content.faq.heading %>" class="admin-input" />
+    </div>
+  </div>
+
+  <div id="rows" class="space-y-4">
+    <% content.faq.items.forEach(function(item){ %>
+    <div class="row grid gap-3 rounded-lg border border-primary-900/10 p-4 sm:grid-cols-[1fr_1fr_auto]">
+      <div>
+        <label class="admin-label">প্রশ্ন</label>
+        <input type="text" name="question[]" value="<%= item.question %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">উত্তর</label>
+        <textarea name="answer[]" rows="3" class="admin-input"><%= item.answer %></textarea>
+      </div>
+      <div class="flex items-end">
+        <button type="button" class="admin-btn-danger remove-row">মুছুন</button>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+
+  <button type="button" id="addRow" class="admin-btn !bg-primary-100 !text-primary-800 hover:!bg-primary-200">+ নতুন প্রশ্ন যোগ করুন</button>
+
+  <div>
+    <button type="submit" class="admin-btn">সংরক্ষণ করুন</button>
+  </div>
+</form>
+
+<template id="rowTemplate">
+  <div class="row grid gap-3 rounded-lg border border-primary-900/10 p-4 sm:grid-cols-[1fr_1fr_auto]">
+    <div>
+      <label class="admin-label">প্রশ্ন</label>
+      <input type="text" name="question[]" class="admin-input" />
+    </div>
+    <div>
+      <label class="admin-label">উত্তর</label>
+      <textarea name="answer[]" rows="3" class="admin-input"></textarea>
+    </div>
+    <div class="flex items-end">
+      <button type="button" class="admin-btn-danger remove-row">মুছুন</button>
+    </div>
+  </div>
+</template>
+
+<script>
+  document.getElementById('addRow').addEventListener('click', () => {
+    const tpl = document.getElementById('rowTemplate');
+    document.getElementById('rows').appendChild(tpl.content.cloneNode(true));
+  });
+  document.getElementById('rows').addEventListener('click', (e) => {
+    if (e.target.classList.contains('remove-row')) {
+      e.target.closest('.row').remove();
+    }
+  });
+</script>
+
+<%- include('../partials/admin-layout-bottom') %>

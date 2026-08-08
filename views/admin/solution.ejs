@@ -1,0 +1,54 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">সমাধান সেকশন</h1>
+<p class="mt-1 text-sm text-ink/60">"মানুষ শিফা খুঁজতে গিয়ে ঠকে যায়" সেকশনের কন্টেন্ট ও গ্যালারি ছবি।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/solution" method="POST" enctype="multipart/form-data" class="admin-card mt-6 max-w-2xl space-y-5">
+  <div>
+    <label class="admin-label">ছোট ব্যাজ টেক্সট</label>
+    <input type="text" name="eyebrow" value="<%= content.solution.eyebrow %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">শিরোনাম</label>
+    <input type="text" name="heading" value="<%= content.solution.heading %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">"মানুষ যেদিকে যায়" বক্সের শিরোনাম</label>
+    <input type="text" name="wrongWaysHeading" value="<%= content.solution.wrongWaysHeading %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">ভুল পদ্ধতির তালিকা (প্রতি লাইনে একটি)</label>
+    <textarea name="wrongWaysRaw" rows="5" class="admin-input"><%= content.solution.wrongWaysRaw %></textarea>
+  </div>
+  <div>
+    <label class="admin-label">নোট / বিবরণ</label>
+    <textarea name="note" rows="4" class="admin-input"><%= content.solution.note %></textarea>
+  </div>
+
+  <div>
+    <label class="admin-label">গ্যালারি ছবি যোগ করুন (একাধিক নির্বাচন করা যাবে)</label>
+    <input type="file" name="images" accept="image/*" multiple class="admin-input" />
+  </div>
+
+  <button type="submit" class="admin-btn">সংরক্ষণ করুন</button>
+</form>
+
+<% if (content.solution.images && content.solution.images.length) { %>
+<div class="admin-card mt-6 max-w-2xl">
+  <h3 class="font-display font-bold text-primary-800">বর্তমান গ্যালারি ছবি</h3>
+  <div class="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
+    <% content.solution.images.forEach(function(img, i){ %>
+    <div class="group relative overflow-hidden rounded-lg ring-1 ring-primary-900/10">
+      <img src="<%= img %>" class="aspect-square w-full object-cover" />
+      <form action="/admin/solution/image/<%= i %>/delete" method="POST" class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition group-hover:opacity-100">
+        <button type="submit" class="admin-btn-danger">মুছুন</button>
+      </form>
+    </div>
+    <% }); %>
+  </div>
+</div>
+<% } %>
+
+<%- include('../partials/admin-layout-bottom') %>

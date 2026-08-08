@@ -1,0 +1,61 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">ড্যাশবোর্ড</h1>
+<p class="mt-1 text-sm text-ink/60">এখান থেকে আপনার ল্যান্ডিং পেজের সব কন্টেন্ট পরিবর্তন করতে পারবেন।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  <a href="/admin/orders" class="admin-card border-2 border-primary-300 bg-primary-50/40 transition hover:-translate-y-1 hover:shadow-soft">
+    <span class="text-2xl">📦</span>
+    <h3 class="mt-3 font-display font-bold text-primary-800">অর্ডার সমূহ</h3>
+    <p class="mt-1 text-sm text-ink/60">গ্রাহকদের অর্ডার দেখুন, সার্চ করুন, মুছুন</p>
+  </a>
+  <a href="/admin/settings" class="admin-card transition hover:-translate-y-1 hover:shadow-soft">
+    <span class="text-2xl">⚙️</span>
+    <h3 class="mt-3 font-display font-bold text-primary-800">সাইট সেটিংস</h3>
+    <p class="mt-1 text-sm text-ink/60">সাইট নাম, লোগো, ফোন, অর্ডার লিংক</p>
+  </a>
+  <a href="/admin/hero" class="admin-card transition hover:-translate-y-1 hover:shadow-soft">
+    <span class="text-2xl">🏷️</span>
+    <h3 class="mt-3 font-display font-bold text-primary-800">হিরো সেকশন</h3>
+    <p class="mt-1 text-sm text-ink/60">প্রধান শিরোনাম, বিবরণ, ভিডিও থাম্বনেইল</p>
+  </a>
+  <a href="/admin/problems" class="admin-card transition hover:-translate-y-1 hover:shadow-soft">
+    <span class="text-2xl">❗</span>
+    <h3 class="mt-3 font-display font-bold text-primary-800">সমস্যা সেকশন</h3>
+    <p class="mt-1 text-sm text-ink/60">"কিছু একটা ঠিক নেই" কার্ডগুলো</p>
+  </a>
+  <a href="/admin/solution" class="admin-card transition hover:-translate-y-1 hover:shadow-soft">
+    <span class="text-2xl">✅</span>
+    <h3 class="mt-3 font-display font-bold text-primary-800">সমাধান সেকশন</h3>
+    <p class="mt-1 text-sm text-ink/60">গ্যালারি ছবি ও বিবরণ</p>
+  </a>
+  <a href="/admin/why-us" class="admin-card transition hover:-translate-y-1 hover:shadow-soft">
+    <span class="text-2xl">⭐</span>
+    <h3 class="mt-3 font-display font-bold text-primary-800">কেন আলাদা</h3>
+    <p class="mt-1 text-sm text-ink/60">তুলনামূলক তালিকা</p>
+  </a>
+  <a href="/admin/faq" class="admin-card transition hover:-translate-y-1 hover:shadow-soft">
+    <span class="text-2xl">❓</span>
+    <h3 class="mt-3 font-display font-bold text-primary-800">প্রশ্নোত্তর</h3>
+    <p class="mt-1 text-sm text-ink/60">প্রশ্ন যোগ/মুছুন</p>
+  </a>
+  <a href="/admin/testimonials" class="admin-card transition hover:-translate-y-1 hover:shadow-soft">
+    <span class="text-2xl">💬</span>
+    <h3 class="mt-3 font-display font-bold text-primary-800">গ্রাহক রিভিউ</h3>
+    <p class="mt-1 text-sm text-ink/60">রিভিউ যোগ/মুছুন</p>
+  </a>
+  <a href="/admin/footer" class="admin-card transition hover:-translate-y-1 hover:shadow-soft">
+    <span class="text-2xl">📄</span>
+    <h3 class="mt-3 font-display font-bold text-primary-800">ফুটার</h3>
+    <p class="mt-1 text-sm text-ink/60">ফুটার তথ্য পরিবর্তন</p>
+  </a>
+  <a href="/" target="_blank" class="admin-card border-2 border-gold-300 bg-gold-50/40 transition hover:-translate-y-1 hover:shadow-soft">
+    <span class="text-2xl">🌐</span>
+    <h3 class="mt-3 font-display font-bold text-primary-800">লাইভ সাইট দেখুন</h3>
+    <p class="mt-1 text-sm text-ink/60">নতুন ট্যাবে খুলবে</p>
+  </a>
+</div>
+
+<%- include('../partials/admin-layout-bottom') %>

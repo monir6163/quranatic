@@ -1,0 +1,69 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">অর্ডার সমূহ</h1>
+<p class="mt-1 text-sm text-ink/60">সাইট থেকে যারা অর্ডার ফর্ম সাবমিট করেছেন তাদের তালিকা।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/orders" method="GET" class="admin-card mt-6 flex flex-wrap items-end gap-3">
+  <div class="min-w-[220px] flex-1">
+    <label class="admin-label">মোবাইল নাম্বার দিয়ে সার্চ করুন</label>
+    <input type="text" name="phone" value="<%= phone %>" placeholder="যেমন: 017" class="admin-input" />
+  </div>
+  <button type="submit" class="admin-btn">সার্চ করুন</button>
+  <% if (phone) { %>
+    <a href="/admin/orders" class="admin-btn !bg-primary-100 !text-primary-800 hover:!bg-primary-200">রিসেট</a>
+  <% } %>
+</form>
+
+<div class="admin-card mt-6 overflow-x-auto p-0">
+  <table class="w-full min-w-[900px] text-left text-sm">
+    <thead>
+      <tr class="border-b border-primary-900/10 bg-primary-50 text-xs font-bold uppercase tracking-wide text-primary-800">
+        <th class="px-4 py-3">নাম</th>
+        <th class="px-4 py-3">ফোন</th>
+        <th class="px-4 py-3">ঠিকানা</th>
+        <th class="px-4 py-3">হাদিয়া</th>
+        <th class="px-4 py-3">ডেলিভারি</th>
+        <th class="px-4 py-3">সর্বমোট</th>
+        <th class="px-4 py-3">তারিখ</th>
+        <th class="px-4 py-3 text-right">অ্যাকশন</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (!orders.length) { %>
+      <tr>
+        <td colspan="8" class="px-4 py-8 text-center text-ink/50">
+          <% if (phone) { %>
+            "<%= phone %>" নাম্বার দিয়ে কোনো অর্ডার পাওয়া যায়নি।
+          <% } else { %>
+            এখনো কোনো অর্ডার আসেনি।
+          <% } %>
+        </td>
+      </tr>
+      <% } %>
+      <% orders.forEach(function(o){ %>
+      <tr class="border-b border-primary-900/5 align-top hover:bg-primary-50/40">
+        <td class="px-4 py-3 font-semibold text-ink"><%= o.name %></td>
+        <td class="px-4 py-3 whitespace-nowrap"><%= o.phone %></td>
+        <td class="px-4 py-3 max-w-[220px] text-ink/70"><%= o.address %></td>
+        <td class="px-4 py-3 whitespace-nowrap">৳<%= o.hadiya %></td>
+        <td class="px-4 py-3 whitespace-nowrap">৳<%= o.deliveryCharge %><br /><span class="text-xs text-ink/45"><%= o.deliveryLabel %></span></td>
+        <td class="px-4 py-3 whitespace-nowrap font-bold text-primary-700">৳<%= o.total %></td>
+        <td class="px-4 py-3 whitespace-nowrap text-xs text-ink/60">
+          <%= new Date(o.createdAt).toLocaleDateString('bn-BD', { day: '2-digit', month: 'short', year: 'numeric' }) %><br />
+          <%= new Date(o.createdAt).toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }) %>
+        </td>
+        <td class="px-4 py-3 text-right">
+          <form action="/admin/orders/<%= o._id %>/delete" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত এই অর্ডারটি মুছে ফেলতে চান?');">
+            <input type="hidden" name="phone" value="<%= phone %>" />
+            <button type="submit" class="admin-btn-danger">মুছুন</button>
+          </form>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/admin-layout-bottom') %>

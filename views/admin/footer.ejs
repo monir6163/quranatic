@@ -1,0 +1,25 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">ফুটার</h1>
+<p class="mt-1 text-sm text-ink/60">পেজের নিচের অংশের তথ্য পরিবর্তন করুন।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/footer" method="POST" class="admin-card mt-6 max-w-2xl space-y-5">
+  <div>
+    <label class="admin-label">সংক্ষিপ্ত পরিচিতি</label>
+    <textarea name="about" rows="3" class="admin-input"><%= content.footer.about %></textarea>
+  </div>
+  <div>
+    <label class="admin-label">নোট টেক্সট (যোগাযোগ অংশে দেখাবে)</label>
+    <input type="text" name="note" value="<%= content.footer.note %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">কপিরাইট টেক্সট</label>
+    <input type="text" name="copyrightText" value="<%= content.footer.copyrightText %>" class="admin-input" />
+  </div>
+
+  <button type="submit" class="admin-btn">সংরক্ষণ করুন</button>
+</form>
+
+<%- include('../partials/admin-layout-bottom') %>

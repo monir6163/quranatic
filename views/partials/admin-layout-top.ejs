@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>অ্যাডমিন প্যানেল — <%= typeof content !== 'undefined' ? content.siteSettings.siteName : 'রুকিয়াহ পেপার' %></title>
+  <link href="/css/output.css" rel="stylesheet" />
+</head>
+<body class="min-h-screen bg-canvas font-body text-ink">
+  <div class="flex min-h-screen flex-col md:flex-row">
+
+    <!-- Sidebar -->
+    <aside class="flex-none border-b border-primary-900/10 bg-primary-800 text-white md:min-h-screen md:w-64">
+      <div class="flex items-center gap-2 px-5 py-5">
+        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-400 text-lg text-primary-900">﷽</span>
+        <span class="font-display text-base font-bold">অ্যাডমিন প্যানেল</span>
+      </div>
+      <nav class="grid grid-cols-2 gap-1 px-3 pb-4 text-sm md:grid-cols-1 md:pb-6">
+        <a href="/admin" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'dashboard' ? 'bg-white/15 font-bold' : '' %>">🏠 ড্যাশবোর্ড</a>
+        <a href="/admin/orders" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'orders' ? 'bg-white/15 font-bold' : '' %>">📦 অর্ডার সমূহ</a>
+        <a href="/admin/settings" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'settings' ? 'bg-white/15 font-bold' : '' %>">⚙️ সাইট সেটিংস</a>
+        <a href="/admin/hero" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'hero' ? 'bg-white/15 font-bold' : '' %>">🏷️ হিরো সেকশন</a>
+        <a href="/admin/problems" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'problems' ? 'bg-white/15 font-bold' : '' %>">❗ সমস্যা</a>
+        <a href="/admin/solution" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'solution' ? 'bg-white/15 font-bold' : '' %>">✅ সমাধান</a>
+        <a href="/admin/why-us" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'whyUs' ? 'bg-white/15 font-bold' : '' %>">⭐ কেন আলাদা</a>
+        <a href="/admin/faq" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'faq' ? 'bg-white/15 font-bold' : '' %>">❓ প্রশ্নোত্তর</a>
+        <a href="/admin/testimonials" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'testimonials' ? 'bg-white/15 font-bold' : '' %>">💬 গ্রাহক রিভিউ</a>
+        <a href="/admin/footer" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'footer' ? 'bg-white/15 font-bold' : '' %>">📄 ফুটার</a>
+        <a href="/admin/account" class="rounded-lg px-4 py-2.5 transition hover:bg-white/10 <%= active === 'account' ? 'bg-white/15 font-bold' : '' %>">🔑 পাসওয়ার্ড</a>
+        <a href="/" target="_blank" class="rounded-lg px-4 py-2.5 text-gold-200 transition hover:bg-white/10">🌐 লাইভ সাইট দেখুন</a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="flex-1">
+      <header class="flex items-center justify-between border-b border-primary-900/10 bg-white px-6 py-4">
+        <p class="text-sm text-ink/60">স্বাগতম, <strong><%= typeof adminUsername !== 'undefined' ? adminUsername : '' %></strong></p>
+        <form action="/admin/logout" method="POST">
+          <button class="text-sm font-semibold text-clay hover:underline">লগআউট</button>
+        </form>
+      </header>
+
+      <main class="px-5 py-6 md:px-8 md:py-8">

@@ -1,0 +1,53 @@
+<footer class="bg-primary-800 pb-28 pt-14 text-primary-50 md:pb-14">
+  <div class="mx-auto grid max-w-6xl gap-10 px-5 md:grid-cols-3">
+    <div>
+      <div class="flex items-center gap-2.5">
+        <% if (content.siteSettings.logo) { %>
+          <img src="<%= content.siteSettings.logo %>" alt="logo" class="h-9 w-9 rounded-lg object-cover" />
+        <% } else { %>
+          <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-400 text-lg text-primary-900">﷽</span>
+        <% } %>
+        <span class="font-display text-lg font-bold"><%= content.siteSettings.siteName %></span>
+      </div>
+      <p class="mt-4 text-sm leading-relaxed text-primary-100/80"><%= content.footer.about %></p>
+    </div>
+
+    <div>
+      <h4 class="font-display text-base font-bold text-gold-200">গুরুত্বপূর্ণ লিংক</h4>
+      <ul class="mt-4 space-y-2 text-sm text-primary-100/80">
+        <li><a href="#problems" class="transition hover:text-gold-200">সমস্যা</a></li>
+        <li><a href="#solution" class="transition hover:text-gold-200">সমাধান</a></li>
+        <li><a href="#faq" class="transition hover:text-gold-200">প্রশ্নোত্তর</a></li>
+        <li><a href="#testimonials" class="transition hover:text-gold-200">গ্রাহক রিভিউ</a></li>
+        <li><a href="/admin/login" class="transition hover:text-gold-200">অ্যাডমিন</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="font-display text-base font-bold text-gold-200">যোগাযোগ</h4>
+      <ul class="mt-4 space-y-2 text-sm text-primary-100/80">
+        <li>ফোন: <%= content.siteSettings.phone %></li>
+        <li><%= content.footer.note %></li>
+      </ul>
+      <a href="<%= content.siteSettings.ctaLink %>" class="btn-primary mt-5 !bg-gold-400 !text-primary-900 hover:!bg-gold-300">
+        <%= content.siteSettings.ctaText %>
+      </a>
+    </div>
+  </div>
+
+  <div class="mx-auto mt-10 max-w-6xl border-t border-primary-100/10 px-5 pt-6 text-center text-xs text-primary-100/60">
+    &copy; <%= new Date().getFullYear() %> <%= content.siteSettings.siteName %> — <%= content.footer.copyrightText %>
+  </div>
+</footer>
+
+<!-- Mobile sticky order bar -->
+<div class="fixed inset-x-0 bottom-0 z-50 border-t border-primary-900/10 bg-white/95 px-5 py-3 shadow-[0_-6px_20px_rgba(19,36,32,0.08)] backdrop-blur md:hidden">
+  <a href="<%= content.siteSettings.ctaLink %>" class="btn-primary block w-full !py-3 text-center">
+    <%= content.siteSettings.ctaText %>
+  </a>
+</div>
+
+<a href="<%= content.siteSettings.whatsapp %>" target="_blank" rel="noopener"
+   class="fixed bottom-24 right-5 z-50 hidden h-14 w-14 items-center justify-center rounded-full bg-green-500 text-2xl text-white shadow-soft transition hover:scale-110 md:bottom-6 md:flex">
+  💬
+</a>

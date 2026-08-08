@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body class="overflow-x-hidden bg-canvas font-body text-ink">
+
+  <%- include('partials/site-header') %>
+
+  <!-- ================= HERO ================= -->
+  <section id="top" class="relative overflow-hidden pb-16 pt-14 md:pb-24 md:pt-20">
+    <div class="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-primary-200/40 blur-3xl"></div>
+    <div class="pointer-events-none absolute -right-16 top-40 h-64 w-64 animate-floatSlow rounded-full bg-gold-200/40 blur-3xl"></div>
+
+    <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-2">
+      <div class="reveal">
+        <span class="eyebrow"><span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span><%= content.hero.eyebrow %></span>
+
+        <h1 class="mt-5 font-display text-3xl font-extrabold text-primary-900 sm:text-4xl lg:text-[2.6rem]" style="line-height: 1.55;">
+          <%= content.hero.titleBeforeHighlight %>
+          <span class="relative inline-block text-primary-600">
+            <%= content.hero.titleHighlight %>
+            <svg class="absolute -bottom-1 left-0 w-full" height="10" viewBox="0 0 200 10" preserveAspectRatio="none">
+              <path d="M0,7 Q50,0 100,6 T200,5" stroke="#C89B3C" stroke-width="5" fill="none" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </h1>
+
+        <p class="mt-5 text-[15px] leading-relaxed text-ink/70 sm:text-base">
+          <%= content.hero.description %>
+        </p>
+
+        <ul class="mt-6 grid gap-2.5 sm:grid-cols-2">
+          <% heroBullets.forEach(function(item){ %>
+          <li class="flex items-start gap-2 text-sm text-ink/80">
+            <span class="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-primary-100 text-[11px] font-bold text-primary-700">✓</span>
+            <%= item %>
+          </li>
+          <% }); %>
+        </ul>
+
+        <div class="mt-8 flex flex-wrap items-center gap-4">
+          <a href="<%= content.siteSettings.ctaLink %>" class="btn-primary">
+            <%= content.siteSettings.ctaText %>
+          </a>
+        </div>
+      </div>
+
+      <div class="reveal" style="transition-delay:120ms">
+        <div class="relative mx-auto max-w-md">
+          <div class="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-primary-200/60 via-gold-100/60 to-transparent blur-2xl"></div>
+          <div class="overflow-hidden rounded-xl2 bg-white p-3 shadow-soft ring-1 ring-primary-900/5">
+            <div class="relative overflow-hidden rounded-xl bg-primary-900">
+              <% if (content.hero.videoThumbnail) { %>
+                <img src="<%= content.hero.videoThumbnail %>" alt="ভিডিও থাম্বনেইল" class="aspect-[4/5] w-full object-cover opacity-90" />
+              <% } else { %>
+                <div class="flex aspect-[4/5] w-full items-center justify-center bg-gradient-to-br from-primary-700 to-primary-900 text-6xl">📖</div>
+              <% } %>
+              <% if (content.hero.videoUrl) { %>
+              <a href="<%= content.hero.videoUrl %>" target="_blank" rel="noopener" class="absolute inset-0 flex items-center justify-center">
+                <span class="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 text-2xl text-primary-700 shadow-soft transition hover:scale-110">▶</span>
+              </a>
+              <% } %>
+              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                <p class="font-display text-sm font-bold text-white"><%= content.hero.titleBeforeHighlight %> <%= content.hero.titleHighlight %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PROBLEMS ================= -->
+  <section id="problems" class="bg-white py-16 md:py-24">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="reveal mx-auto max-w-2xl text-center">
+        <span class="eyebrow"><%= content.problems.eyebrow %></span>
+        <h2 class="mt-4 font-display text-2xl font-extrabold text-primary-900 sm:text-3xl"><%= content.problems.heading %></h2>
+      </div>
+
+      <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <% content.problems.items.forEach(function(item, i){ %>
+        <div class="reveal card hover:-translate-y-1 hover:shadow-soft <%= i === content.problems.items.length - 1 ? 'border-2 border-gold-300 bg-gold-50/40' : '' %>" style="transition-delay:<%= (i%3)*90 %>ms">
+          <h3 class="font-display text-base font-bold text-primary-800"><%= item.title %></h3>
+          <p class="mt-2 text-sm leading-relaxed text-ink/65"><%= item.description %></p>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SOLUTION ================= -->
+  <section id="solution" class="py-16 md:py-24">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="reveal mx-auto max-w-2xl text-center">
+        <span class="eyebrow"><%= content.solution.eyebrow %></span>
+        <h2 class="mt-4 font-display text-2xl font-extrabold text-primary-900 sm:text-3xl"><%= content.solution.heading %></h2>
+      </div>
+
+      <div class="mt-10 grid items-center gap-8 lg:grid-cols-2">
+        <div class="reveal card">
+          <h3 class="font-display text-lg font-bold text-clay"><%= content.solution.wrongWaysHeading %></h3>
+          <ul class="mt-4 space-y-2.5">
+            <% wrongWays.forEach(function(item){ %>
+            <li class="flex items-start gap-2 text-sm text-ink/75">
+              <span class="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-clay/10 text-xs font-bold text-clay">✕</span>
+              <%= item %>
+            </li>
+            <% }); %>
+          </ul>
+          <p class="mt-5 rounded-lg bg-primary-50 p-4 text-sm leading-relaxed text-primary-800"><%= content.solution.note %></p>
+        </div>
+
+        <div class="reveal" style="transition-delay:120ms">
+          <% if (content.solution.images && content.solution.images.length) { %>
+          <div class="relative overflow-hidden rounded-xl2 shadow-soft" x-data>
+            <div class="flex snap-x snap-mandatory overflow-x-auto" id="solutionGallery">
+              <% content.solution.images.forEach(function(img){ %>
+              <img src="<%= img %>" class="aspect-[4/5] w-full flex-none snap-center rounded-xl2 object-cover" alt="সমাধান" />
+              <% }); %>
+            </div>
+          </div>
+          <% } else { %>
+          <div class="flex aspect-[4/5] w-full items-center justify-center rounded-xl2 bg-gradient-to-br from-primary-700 to-primary-900 text-7xl text-gold-200 shadow-soft">📜</div>
+          <% } %>
+          <div class="mt-6 text-center">
+            <a href="<%= content.siteSettings.ctaLink %>" class="btn-primary">অর্ডার করতে চাই →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WHY US ================= -->
+  <section class="bg-primary-900 py-16 text-white md:py-24">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="reveal mx-auto max-w-2xl text-center">
+        <h2 class="font-display text-2xl font-extrabold sm:text-3xl"><%= content.whyUs.heading %></h2>
+        <p class="mt-2 text-primary-100/70"><%= content.whyUs.subheading %></p>
+      </div>
+
+      <div class="mt-10 grid gap-6 lg:grid-cols-2">
+        <div class="reveal rounded-xl2 bg-white/5 p-6 ring-1 ring-white/10">
+          <ul class="space-y-2.5">
+            <% struggleItems.forEach(function(item){ %>
+            <li class="flex items-start gap-2 text-sm text-primary-50/80">
+              <span class="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/10 text-xs">•</span>
+              <%= item %>
+            </li>
+            <% }); %>
+          </ul>
+          <h4 class="mt-5 font-display text-base font-bold text-gold-200"><%= content.whyUs.struggleTitle %></h4>
+          <p class="mt-2 text-sm leading-relaxed text-primary-50/75"><%= content.whyUs.struggleBoxText %></p>
+        </div>
+
+        <div class="reveal rounded-xl2 bg-gold-400 p-6 text-primary-900" style="transition-delay:120ms">
+          <h4 class="font-display text-lg font-bold"><%= content.whyUs.oursTitle %></h4>
+          <ul class="mt-4 space-y-2.5">
+            <% oursItems.forEach(function(item){ %>
+            <li class="flex items-start gap-2 text-sm font-medium">
+              <span class="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-primary-900/10 text-xs font-bold">✓</span>
+              <%= item %>
+            </li>
+            <% }); %>
+          </ul>
+          <p class="mt-5 rounded-lg bg-primary-900/10 p-4 text-xs leading-relaxed"><%= content.whyUs.oursNote %></p>
+        </div>
+      </div>
+
+      <div class="reveal mt-10 text-center">
+        <a href="<%= content.siteSettings.ctaLink %>" class="btn-primary !bg-gold-400 !text-primary-900 hover:!bg-gold-300">
+          <%= content.siteSettings.ctaText %>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FAQ ================= -->
+  <section id="faq" class="bg-white py-16 md:py-24">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="reveal mx-auto max-w-2xl text-center">
+        <span class="eyebrow"><%= content.faq.eyebrow %></span>
+        <h2 class="mt-4 font-display text-2xl font-extrabold text-primary-900 sm:text-3xl"><%= content.faq.heading %></h2>
+      </div>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
+        <% content.faq.items.forEach(function(item, i){ %>
+        <div class="reveal faq-card card cursor-pointer" style="transition-delay: <%= i*90 %>ms">
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="font-display text-base font-bold text-primary-800"><%= item.question %></h3>
+            <span class="faq-toggle mt-1 flex h-6 w-6 flex-none items-center justify-center rounded-full bg-primary-50 text-sm font-bold text-primary-700 transition-transform">+</span>
+          </div>
+          <p class="faq-answer mt-3 text-sm leading-relaxed text-ink/65"><%= item.answer %></p>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TESTIMONIALS ================= -->
+  <section id="testimonials" class="bg-canvas py-16 md:py-24">
+    <div class="mx-auto max-w-4xl px-5">
+      <div class="reveal text-center">
+        <h2 class="font-display text-2xl font-extrabold text-primary-900 sm:text-3xl"><%= content.testimonials.heading %></h2>
+        <p class="mt-2 text-sm text-ink/60"><%= content.testimonials.subheading %></p>
+      </div>
+
+      <% if (content.testimonials.items.length) { %>
+      <div class="reveal relative mt-10">
+        <div id="testimonialTrack" class="flex overflow-hidden">
+          <% content.testimonials.items.forEach(function(item, i){ %>
+          <div class="testimonial-slide w-full flex-none px-2 transition-all duration-500 <%= i === 0 ? '' : 'hidden' %>">
+            <div class="card mx-auto max-w-xl text-center">
+              <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-100 text-xl font-bold text-primary-700">
+                <% if (item.avatar) { %>
+                  <img src="<%= item.avatar %>" class="h-full w-full rounded-full object-cover" alt="<%= item.name %>" />
+                <% } else { %>
+                  <%= item.name ? item.name.charAt(0) : '★' %>
+                <% } %>
+              </div>
+              <p class="mt-4 text-sm italic leading-relaxed text-ink/75">"<%= item.text %>"</p>
+              <p class="mt-4 font-display text-sm font-bold text-primary-800">— <%= item.name %></p>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+
+        <% if (content.testimonials.items.length > 1) { %>
+        <div class="mt-6 flex items-center justify-center gap-4">
+          <button id="testimonialPrev" class="flex h-9 w-9 items-center justify-center rounded-full bg-white text-primary-700 shadow-card transition hover:bg-primary-600 hover:text-white">‹</button>
+          <div id="testimonialDots" class="flex items-center gap-2">
+            <% content.testimonials.items.forEach(function(_, i){ %>
+              <span class="dot h-2 w-2 rounded-full <%= i === 0 ? 'bg-primary-600' : 'bg-primary-200' %>" data-index="<%= i %>"></span>
+            <% }); %>
+          </div>
+          <button id="testimonialNext" class="flex h-9 w-9 items-center justify-center rounded-full bg-white text-primary-700 shadow-card transition hover:bg-primary-600 hover:text-white">›</button>
+        </div>
+        <% } %>
+      </div>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- ================= ORDER FORM ================= -->
+  <section id="order" class="py-16 md:py-24">
+    <div class="mx-auto max-w-3xl px-5">
+      <div class="reveal overflow-hidden rounded-xl2 bg-primary-700 p-6 text-center text-white shadow-soft sm:p-10">
+        <span class="eyebrow !bg-white/10 !text-gold-200 !ring-white/20">সীমিত স্টক — আজই অর্ডার করুন</span>
+        <h2 class="mt-4 font-display text-2xl font-extrabold sm:text-3xl"><%= content.siteSettings.siteName %></h2>
+        <p class="mt-3 text-primary-100/80"><%= content.siteSettings.tagline %></p>
+
+        <form id="orderForm" class="mt-8 rounded-xl2 bg-white p-5 text-left text-ink shadow-soft sm:p-7" novalidate>
+          <div id="orderSuccess" class="hidden rounded-lg bg-primary-50 p-6 text-center">
+            <p class="font-display text-lg font-bold text-primary-700">✅ ধন্যবাদ!</p>
+            <p class="mt-2 text-sm text-ink/70">আপনার অর্ডারটি সফলভাবে জমা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব ইনশাআল্লাহ।</p>
+          </div>
+
+          <div id="orderFields">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="mb-1.5 block text-sm font-semibold text-ink/70">নাম</label>
+              <input type="text" id="orderName" name="name" class="admin-input" placeholder="আপনার পূর্ণ নাম" />
+              <p class="orderError mt-1 hidden text-xs font-semibold text-clay"></p>
+            </div>
+            <div>
+              <label class="mb-1.5 block text-sm font-semibold text-ink/70">ফোন</label>
+              <input type="tel" id="orderPhone" name="phone" class="admin-input" placeholder="01XXXXXXXXX" maxlength="11" />
+              <p class="orderError mt-1 hidden text-xs font-semibold text-clay"></p>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="mb-1.5 block text-sm font-semibold text-ink/70">ঠিকানা</label>
+            <textarea id="orderAddress" name="address" rows="2" class="admin-input" placeholder="বাসা/গ্রাম, থানা, জেলা"></textarea>
+            <p class="orderError mt-1 hidden text-xs font-semibold text-clay"></p>
+          </div>
+
+          <div class="mt-4">
+            <label class="mb-1.5 block text-sm font-semibold text-ink/70">
+              সামর্থ্য অনুযায়ী হাদিয়া
+              <span class="font-normal text-ink/45">(চাইলে ০ দিয়ে নিতে পারেন)</span>
+            </label>
+            <input type="number" id="orderHadiya" name="hadiya" min="0" step="1" value="0" inputmode="numeric" class="admin-input" placeholder="৳ 0" />
+            <p class="orderError mt-1 hidden text-xs font-semibold text-clay"></p>
+          </div>
+
+          <div class="mt-5">
+            <label class="mb-2 block text-sm font-semibold text-ink/70">ডেলিভারি চার্জ</label>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="flex cursor-pointer items-center justify-between rounded-lg border border-primary-900/15 px-4 py-3 text-sm font-medium transition has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:ring-2 has-[:checked]:ring-primary-500/30">
+                <span class="flex items-center gap-2.5">
+                  <input type="radio" name="delivery" value="70" checked class="orderDelivery accent-primary-600" />
+                  ঢাকার ভিতরে
+                </span>
+                <span class="font-display font-bold text-primary-700">৳৭০</span>
+              </label>
+              <label class="flex cursor-pointer items-center justify-between rounded-lg border border-primary-900/15 px-4 py-3 text-sm font-medium transition has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:ring-2 has-[:checked]:ring-primary-500/30">
+                <span class="flex items-center gap-2.5">
+                  <input type="radio" name="delivery" value="130" class="orderDelivery accent-primary-600" />
+                  ঢাকার বাইরে
+                </span>
+                <span class="font-display font-bold text-primary-700">৳১৩০</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="mt-6 flex items-center justify-between rounded-lg bg-primary-50 px-4 py-3.5">
+            <span class="text-sm font-semibold text-primary-800">সর্বমোট মূল্য</span>
+            <span id="orderTotal" class="font-display text-2xl font-extrabold text-primary-700">৳৭০</span>
+          </div>
+
+          <p id="orderSubmitError" class="mt-4 hidden rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-clay"></p>
+
+          <button type="submit" id="orderSubmitBtn" class="btn-primary mt-6 w-full">
+            <%= content.siteSettings.ctaText %>
+          </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <%- include('partials/site-footer') %>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

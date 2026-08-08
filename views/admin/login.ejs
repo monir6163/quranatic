@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>অ্যাডমিন লগইন</title>
+  <link href="/css/output.css" rel="stylesheet" />
+</head>
+<body class="flex min-h-screen items-center justify-center bg-primary-900 px-5 font-body">
+  <div class="w-full max-w-sm rounded-xl2 bg-white p-8 shadow-soft">
+    <div class="mb-6 text-center">
+      <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary-600 text-2xl text-gold-100">﷽</span>
+      <h1 class="mt-3 font-display text-xl font-bold text-primary-900">অ্যাডমিন লগইন</h1>
+      <p class="mt-1 text-xs text-ink/50">কন্টেন্ট ম্যানেজমেন্ট প্যানেল</p>
+    </div>
+
+    <%- include('../partials/admin-flash') %>
+
+    <form action="/admin/login" method="POST" class="space-y-4">
+      <div>
+        <label class="admin-label">ইউজারনেম</label>
+        <input type="text" name="username" required class="admin-input" autofocus />
+      </div>
+      <div>
+        <label class="admin-label">পাসওয়ার্ড</label>
+        <input type="password" name="password" required class="admin-input" />
+      </div>
+      <button type="submit" class="admin-btn w-full !py-3">লগইন করুন</button>
+    </form>
+  </div>
+</body>
+</html>

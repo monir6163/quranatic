@@ -1,0 +1,44 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">হিরো সেকশন</h1>
+<p class="mt-1 text-sm text-ink/60">পেজের একদম উপরের প্রধান অংশ।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/hero" method="POST" enctype="multipart/form-data" class="admin-card mt-6 max-w-2xl space-y-5">
+  <div>
+    <label class="admin-label">ছোট ব্যাজ টেক্সট (eyebrow)</label>
+    <input type="text" name="eyebrow" value="<%= content.hero.eyebrow %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">শিরোনাম (হাইলাইট করার আগের অংশ)</label>
+    <textarea name="titleBeforeHighlight" rows="2" class="admin-input"><%= content.hero.titleBeforeHighlight %></textarea>
+  </div>
+  <div>
+    <label class="admin-label">হাইলাইট করা শব্দ/অংশ (রঙিন দেখাবে)</label>
+    <input type="text" name="titleHighlight" value="<%= content.hero.titleHighlight %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">বিবরণ</label>
+    <textarea name="description" rows="4" class="admin-input"><%= content.hero.description %></textarea>
+  </div>
+  <div>
+    <label class="admin-label">পয়েন্ট লিস্ট (প্রতি লাইনে একটি পয়েন্ট)</label>
+    <textarea name="bulletsRaw" rows="6" class="admin-input"><%= content.hero.bulletsRaw %></textarea>
+  </div>
+  <div>
+    <label class="admin-label">ভিডিও লিংক (ঐচ্ছিক)</label>
+    <input type="text" name="videoUrl" value="<%= content.hero.videoUrl %>" class="admin-input" placeholder="https://youtube.com/..." />
+  </div>
+  <div>
+    <label class="admin-label">ভিডিও থাম্বনেইল ছবি</label>
+    <% if (content.hero.videoThumbnail) { %>
+      <img src="<%= content.hero.videoThumbnail %>" class="mb-2 h-28 w-24 rounded-lg object-cover ring-1 ring-primary-900/10" />
+    <% } %>
+    <input type="file" name="videoThumbnail" accept="image/*" class="admin-input" />
+  </div>
+
+  <button type="submit" class="admin-btn">সংরক্ষণ করুন</button>
+</form>
+
+<%- include('../partials/admin-layout-bottom') %>

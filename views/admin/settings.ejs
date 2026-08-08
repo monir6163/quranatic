@@ -1,0 +1,63 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">সাইট সেটিংস</h1>
+<p class="mt-1 text-sm text-ink/60">সাইটের নাম, লোগো, মূল্য ও অর্ডার বাটনের লিংক এখান থেকে পরিবর্তন করুন — পুরো সাইট জুড়ে ব্যবহৃত হবে।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/settings" method="POST" enctype="multipart/form-data" class="admin-card mt-6 max-w-2xl space-y-5">
+  <div>
+    <label class="admin-label">সাইটের নাম</label>
+    <input type="text" name="siteName" value="<%= content.siteSettings.siteName %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">ট্যাগলাইন</label>
+    <input type="text" name="tagline" value="<%= content.siteSettings.tagline %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">টপ ব্যাজ টেক্সট</label>
+    <input type="text" name="badge" value="<%= content.siteSettings.badge %>" class="admin-input" />
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label class="admin-label">মেয়াদ / ডিউরেশন টেক্সট</label>
+      <input type="text" name="duration" value="<%= content.siteSettings.duration %>" class="admin-input" />
+    </div>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label class="admin-label">ফোন নম্বর</label>
+      <input type="text" name="phone" value="<%= content.siteSettings.phone %>" class="admin-input" />
+    </div>
+    <div>
+      <label class="admin-label">হোয়াটসঅ্যাপ লিংক</label>
+      <input type="text" name="whatsapp" value="<%= content.siteSettings.whatsapp %>" class="admin-input" />
+    </div>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label class="admin-label">অর্ডার বাটনের টেক্সট</label>
+      <input type="text" name="ctaText" value="<%= content.siteSettings.ctaText %>" class="admin-input" />
+    </div>
+    <div>
+      <label class="admin-label">অর্ডার বাটনের লিংক</label>
+      <input type="text" name="ctaLink" value="<%= content.siteSettings.ctaLink %>" class="admin-input" />
+      <p class="mt-1 text-xs text-ink/40">যেমন: #order অথবা হোয়াটসঅ্যাপ/ফর্ম লিংক</p>
+    </div>
+  </div>
+
+  <div>
+    <label class="admin-label">লোগো</label>
+    <% if (content.siteSettings.logo) { %>
+      <img src="<%= content.siteSettings.logo %>" class="mb-2 h-14 w-14 rounded-lg object-cover ring-1 ring-primary-900/10" />
+    <% } %>
+    <input type="file" name="logo" accept="image/*" class="admin-input" />
+  </div>
+
+  <button type="submit" class="admin-btn">সংরক্ষণ করুন</button>
+</form>
+
+<%- include('../partials/admin-layout-bottom') %>

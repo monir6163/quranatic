@@ -1,0 +1,25 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">পাসওয়ার্ড পরিবর্তন</h1>
+<p class="mt-1 text-sm text-ink/60">নিরাপত্তার জন্য নিয়মিত পাসওয়ার্ড পরিবর্তন করুন।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/account" method="POST" class="admin-card mt-6 max-w-md space-y-5">
+  <div>
+    <label class="admin-label">বর্তমান পাসওয়ার্ড</label>
+    <input type="password" name="currentPassword" required class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">নতুন পাসওয়ার্ড</label>
+    <input type="password" name="newPassword" required minlength="6" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">নতুন পাসওয়ার্ড আবার লিখুন</label>
+    <input type="password" name="confirmPassword" required minlength="6" class="admin-input" />
+  </div>
+
+  <button type="submit" class="admin-btn">পাসওয়ার্ড পরিবর্তন করুন</button>
+</form>
+
+<%- include('../partials/admin-layout-bottom') %>

@@ -1,0 +1,51 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">"কেন আলাদা" সেকশন</h1>
+<p class="mt-1 text-sm text-ink/60">তুলনামূলক দুই কলামের কন্টেন্ট পরিবর্তন করুন।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/why-us" method="POST" class="admin-card mt-6 max-w-2xl space-y-5">
+  <div>
+    <label class="admin-label">প্রধান শিরোনাম</label>
+    <input type="text" name="heading" value="<%= content.whyUs.heading %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">সাব-শিরোনাম</label>
+    <input type="text" name="subheading" value="<%= content.whyUs.subheading %>" class="admin-input" />
+  </div>
+
+  <hr class="border-primary-900/10" />
+  <h3 class="font-display font-bold text-primary-800">বাম কলাম (সমস্যা)</h3>
+  <div>
+    <label class="admin-label">তালিকা (প্রতি লাইনে একটি)</label>
+    <textarea name="struggleItemsRaw" rows="5" class="admin-input"><%= content.whyUs.struggleItemsRaw %></textarea>
+  </div>
+  <div>
+    <label class="admin-label">বক্স শিরোনাম</label>
+    <input type="text" name="struggleTitle" value="<%= content.whyUs.struggleTitle %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">বক্স বিবরণ</label>
+    <textarea name="struggleBoxText" rows="3" class="admin-input"><%= content.whyUs.struggleBoxText %></textarea>
+  </div>
+
+  <hr class="border-primary-900/10" />
+  <h3 class="font-display font-bold text-primary-800">ডান কলাম (আমাদের সুবিধা)</h3>
+  <div>
+    <label class="admin-label">বক্স শিরোনাম</label>
+    <input type="text" name="oursTitle" value="<%= content.whyUs.oursTitle %>" class="admin-input" />
+  </div>
+  <div>
+    <label class="admin-label">তালিকা (প্রতি লাইনে একটি)</label>
+    <textarea name="oursItemsRaw" rows="5" class="admin-input"><%= content.whyUs.oursItemsRaw %></textarea>
+  </div>
+  <div>
+    <label class="admin-label">নোট</label>
+    <textarea name="oursNote" rows="3" class="admin-input"><%= content.whyUs.oursNote %></textarea>
+  </div>
+
+  <button type="submit" class="admin-btn">সংরক্ষণ করুন</button>
+</form>
+
+<%- include('../partials/admin-layout-bottom') %>
