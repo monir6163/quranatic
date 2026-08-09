@@ -31,6 +31,7 @@
       border: 0;
     }
   </style>
+</head>
 <body class="overflow-x-hidden bg-canvas font-body text-ink">
 
   <%- include('partials/site-header') %>
@@ -55,12 +56,7 @@
         </h1>
 
         <!-- ============ MOBILE ORDER FORM (visible < md) ============ -->
-        <form id="order" class="js-order-form order-form-mobile mt-3 rounded-xl2 bg-white p-5 text-left text-ink shadow-soft" novalidate>
-          <div class="js-order-success hidden rounded-lg bg-primary-50 p-6 text-center">
-            <p class="font-display text-lg font-bold text-primary-700">✅ ধন্যবাদ!</p>
-            <p class="mt-2 text-sm text-ink/70">আপনার অর্ডারটি সফলভাবে জমা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব ইনশাআল্লাহ।</p>
-          </div>
-
+        <form class="js-order-form order-form-mobile mt-3 rounded-xl2 bg-white p-5 text-left text-ink shadow-soft" novalidate>
           <div class="js-order-fields">
             <div class="grid gap-4 sm:grid-cols-2">
               <div>
@@ -120,6 +116,11 @@
             <button type="submit" class="btn-primary mt-6 w-full">
               <%= content.siteSettings.ctaText %>
             </button>
+
+            <div class="js-order-success hidden mt-4 rounded-lg bg-primary-50 p-4 text-center">
+              <p class="font-display text-base font-bold text-primary-700">✅ ধন্যবাদ!</p>
+              <p class="mt-1 text-sm text-ink/70">আপনার অর্ডারটি সফলভাবে জমা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব ইনশাআল্লাহ।</p>
+            </div>
           </div>
         </form>
 
@@ -138,12 +139,7 @@
       </div>
 
       <!-- ============ DESKTOP / TABLET ORDER FORM (visible >= md) ============ -->
-      <form id="order" class="js-order-form order-form-desktop rounded-xl2 bg-white p-5 text-left text-ink shadow-soft" novalidate>
-        <div class="js-order-success hidden rounded-lg bg-primary-50 p-6 text-center">
-          <p class="font-display text-lg font-bold text-primary-700">✅ ধন্যবাদ!</p>
-          <p class="mt-2 text-sm text-ink/70">আপনার অর্ডারটি সফলভাবে জমা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব ইনশাআল্লাহ।</p>
-        </div>
-
+      <form class="js-order-form order-form-desktop rounded-xl2 bg-white p-5 text-left text-ink shadow-soft" novalidate>
         <div class="js-order-fields">
           <div class="grid gap-4 sm:grid-cols-2">
             <div>
@@ -203,6 +199,11 @@
           <button type="submit" class="btn-primary mt-6 w-full">
             <%= content.siteSettings.ctaText %>
           </button>
+
+          <div class="js-order-success hidden mt-4 rounded-lg bg-primary-50 p-4 text-center">
+            <p class="font-display text-base font-bold text-primary-700">✅ ধন্যবাদ!</p>
+            <p class="mt-1 text-sm text-ink/70">আপনার অর্ডারটি সফলভাবে জমা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব ইনশাআল্লাহ।</p>
+          </div>
         </div>
       </form>
     </div>
@@ -220,7 +221,7 @@
   <section class="py-16 md:py-24">
     <div class="mx-auto max-w-6xl px-5">
       <div class="reveal mx-auto max-w-2xl text-center">
-        <h2 class="font-display text-2xl font-extrabold text-primary-900 sm:text-3xl">সমস্ত প্রকার জ্বিন ও জাদু হতে মুক্তির জন্য কোরআনী চিকিৎসা</h2>
+        <h2 class="font-display text-2xl font-extrabold text-primary-900 sm:text-3xl">ভিডিও</h2>
       </div>
       <div class="reveal" style="transition-delay:120ms">
         <div class="relative mx-auto max-w-3xl">
@@ -454,6 +455,14 @@
         return checked ? parseInt(checked.value, 10) : 0;
       }
 
+      function currentDeliveryLabel() {
+        const checked = form.querySelector('.js-order-delivery:checked');
+        if (!checked) return '';
+        const labelWrap = checked.closest('label');
+        const textSpan = labelWrap ? labelWrap.querySelector('span') : null;
+        return textSpan ? textSpan.textContent.trim() : '';
+      }
+
       function updateTotal() {
         const hadiya = parseInt(hadiyaInput.value, 10) || 0;
         const delivery = currentDeliveryFee();
@@ -503,12 +512,17 @@
         }
         if (hasError) return;
 
+        const hadiyaValue = parseInt(hadiyaInput.value, 10) || 0;
+        const deliveryCharge = currentDeliveryFee();
+
         const payload = {
           name: nameInput.value.trim(),
           phone: phoneInput.value.trim(),
           address: addressInput.value.trim(),
-          hadiya: parseInt(hadiyaInput.value, 10) || 0,
-          delivery: currentDeliveryFee(),
+          hadiya: hadiyaValue,
+          deliveryCharge: deliveryCharge,
+          deliveryLabel: currentDeliveryLabel(),
+          total: hadiyaValue + deliveryCharge,
         };
 
         try {
@@ -519,8 +533,18 @@
           });
           if (!res.ok) throw new Error('Request failed');
 
-          fieldsWrap.classList.add('hidden');
           successWrap.classList.remove('hidden');
+          form.reset();
+          updateTotal();
+
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            setTimeout(function () {
+              submitBtn.disabled = false;
+              successWrap.classList.add('hidden');
+            }, 6000);
+          }
         } catch (err) {
           submitErrorEl.textContent = 'দুঃখিত, অর্ডার জমা দেওয়া যায়নি। আবার চেষ্টা করুন।';
           submitErrorEl.classList.remove('hidden');
