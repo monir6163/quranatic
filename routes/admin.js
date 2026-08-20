@@ -3,10 +3,106 @@ const router = express.Router();
 const Admin = require("../models/Admin");
 const Content = require("../models/Content");
 const Order = require("../models/Order");
+const AppointmentForm = require("../models/AppointmentForm");
+const Appointment = require("../models/Appointment");
 const upload = require("../middleware/upload");
 const { requireAdmin, redirectIfLoggedIn } = require("../middleware/auth");
 
 const asArray = (v) => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
+
+/* ---- Appointment form-builder definition helpers ---- */
+const FIELD_TYPES = [
+  "text", "textarea", "number", "email", "tel", "date",
+  "select", "radio", "checkbox", "checkbox-group", "note"
+];
+const FIELD_WIDTHS = ["full", "half", "third"];
+const CHOICE_TYPES = ["select", "radio", "checkbox-group"];
+
+function slugify(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 40);
+}
+
+// Validate + normalise the JSON definition posted by the builder UI.
+function sanitizeDefinition(raw) {
+  const def = raw && typeof raw === "object" ? raw : {};
+  const usedKeys = new Set();
+  let counter = 0;
+  const makeKey = (preferred) => {
+    const base = slugify(preferred) || "field";
+    let key = base;
+    while (usedKeys.has(key)) {
+      counter += 1;
+      key = base + "_" + counter;
+    }
+    usedKeys.add(key);
+    return key;
+  };
+
+  const sections = (Array.isArray(def.sections) ? def.sections : [])
+    .map((sec) => {
+      const s = sec && typeof sec === "object" ? sec : {};
+      const fields = (Array.isArray(s.fields) ? s.fields : [])
+        .map((f) => {
+          const fld = f && typeof f === "object" ? f : {};
+          const type = FIELD_TYPES.includes(fld.type) ? fld.type : "text";
+          const width = FIELD_WIDTHS.includes(fld.width) ? fld.width : "full";
+          const labelBn = String(fld.labelBn || "").trim();
+          const labelEn = String(fld.labelEn || "").trim();
+
+          let options = [];
+          if (CHOICE_TYPES.includes(type)) {
+            options = (Array.isArray(fld.options) ? fld.options : [])
+              .map((o) => {
+                const opt = o && typeof o === "object" ? o : {};
+                const oBn = String(opt.labelBn || "").trim();
+                const oEn = String(opt.labelEn || "").trim();
+                let value = String(opt.value || "").trim();
+                if (!value) value = slugify(oEn || oBn) || "option";
+                return { value, labelBn: oBn, labelEn: oEn };
+              })
+              .filter((o) => o.labelBn || o.labelEn);
+          }
+
+          return {
+            key: makeKey(String(fld.key || "").trim() || labelEn || labelBn),
+            type, labelBn, labelEn,
+            placeholderBn: String(fld.placeholderBn || "").trim(),
+            placeholderEn: String(fld.placeholderEn || "").trim(),
+            required: !!fld.required,
+            width, options
+          };
+        })
+        .filter((f) => {
+          if (!(f.labelBn || f.labelEn)) return false; // must have a label
+          if (CHOICE_TYPES.includes(f.type) && f.options.length === 0) return false;
+          return true;
+        });
+
+      return {
+        titleBn: String(s.titleBn || "").trim(),
+        titleEn: String(s.titleEn || "").trim(),
+        fields
+      };
+    })
+    .filter((s) => s.titleBn || s.titleEn || s.fields.length);
+
+  return {
+    titleBn: String(def.titleBn || "").trim(),
+    titleEn: String(def.titleEn || "").trim(),
+    descriptionBn: String(def.descriptionBn || "").trim(),
+    descriptionEn: String(def.descriptionEn || "").trim(),
+    submitTextBn: String(def.submitTextBn || "").trim(),
+    submitTextEn: String(def.submitTextEn || "").trim(),
+    successBn: String(def.successBn || "").trim(),
+    successEn: String(def.successEn || "").trim(),
+    defaultLang: def.defaultLang === "en" ? "en" : "bn",
+    sections
+  };
+}
 
 /* ---------------- AUTH ---------------- */
 
@@ -70,6 +166,79 @@ router.post("/orders/:id/delete", requireAdmin, async (req, res, next) => {
     req.flash("success", "অর্ডার মুছে ফেলা হয়েছে।");
     const phone = (req.body.phone || "").trim();
     res.redirect("/admin/orders" + (phone ? "?phone=" + encodeURIComponent(phone) : ""));
+  } catch (err) {
+    next(err);
+  }
+});
+
+/* ---------------- APPOINTMENT FORM BUILDER ---------------- */
+
+router.get("/appointment-form", requireAdmin, async (req, res, next) => {
+  try {
+    const form = await AppointmentForm.getSingleton();
+    res.render("admin/appointment-form", { form, active: "appointmentForm" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/appointment-form", requireAdmin, async (req, res, next) => {
+  try {
+    const form = await AppointmentForm.getSingleton();
+    let parsed;
+    try {
+      parsed = JSON.parse(req.body.definition || "{}");
+    } catch (e) {
+      req.flash("error", "ফর্ম সংরক্ষণ ব্যর্থ হয়েছে (ডেটা ত্রুটিপূর্ণ)।");
+      return res.redirect("/admin/appointment-form");
+    }
+    form.set(sanitizeDefinition(parsed));
+    await form.save();
+    req.flash("success", "অ্যাপয়েন্টমেন্ট ফর্ম আপডেট হয়েছে।");
+    res.redirect("/admin/appointment-form");
+  } catch (err) {
+    next(err);
+  }
+});
+
+/* ---------------- APPOINTMENT SUBMISSIONS ---------------- */
+
+router.get("/appointments", requireAdmin, async (req, res, next) => {
+  try {
+    const q = (req.query.q || "").trim();
+    const filter = q
+      ? { "answers.value": { $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } }
+      : {};
+    const appointments = await Appointment.find(filter).sort({ createdAt: -1 });
+    res.render("admin/appointments", { appointments, q, active: "appointments" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/appointments/:id", requireAdmin, async (req, res, next) => {
+  try {
+    if (!/^[0-9a-fA-F]{24}$/.test(req.params.id)) {
+      req.flash("error", "আবেদনটি পাওয়া যায়নি।");
+      return res.redirect("/admin/appointments");
+    }
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment) {
+      req.flash("error", "আবেদনটি পাওয়া যায়নি।");
+      return res.redirect("/admin/appointments");
+    }
+    res.render("admin/appointment-detail", { appointment, active: "appointments" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/appointments/:id/delete", requireAdmin, async (req, res, next) => {
+  try {
+    await Appointment.findByIdAndDelete(req.params.id);
+    req.flash("success", "আবেদনটি মুছে ফেলা হয়েছে।");
+    const q = (req.body.q || "").trim();
+    res.redirect("/admin/appointments" + (q ? "?q=" + encodeURIComponent(q) : ""));
   } catch (err) {
     next(err);
   }

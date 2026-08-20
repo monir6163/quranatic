@@ -1,0 +1,55 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<%
+  function displayVal(v){
+    if (Array.isArray(v)) return v.length ? v.join(', ') : '';
+    return v == null ? '' : String(v);
+  }
+%>
+
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <h1 class="font-display text-2xl font-bold text-primary-900">আবেদনের বিস্তারিত</h1>
+    <p class="mt-1 text-sm text-ink/60">
+      <%= new Date(appointment.createdAt).toLocaleDateString('bn-BD', { day: '2-digit', month: 'long', year: 'numeric' }) %>,
+      <%= new Date(appointment.createdAt).toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }) %>
+      · <span class="font-semibold text-primary-700"><%= appointment.language === 'en' ? 'English' : 'বাংলা' %></span> ভাষায় জমা
+    </p>
+  </div>
+  <a href="/admin/appointments" class="admin-btn !bg-primary-100 !text-primary-800 hover:!bg-primary-200">← তালিকায় ফিরুন</a>
+</div>
+
+<%- include('../partials/admin-flash') %>
+
+<div class="admin-card mt-6 p-0">
+  <% if (!appointment.answers.length) { %>
+    <p class="px-4 py-8 text-center text-ink/50">এই আবেদনে কোনো তথ্য নেই।</p>
+  <% } else { %>
+  <dl class="divide-y divide-primary-900/5">
+    <% appointment.answers.forEach(function(a){ %>
+    <% var val = displayVal(a.value); %>
+    <div class="grid gap-1 px-5 py-4 sm:grid-cols-3 sm:gap-4">
+      <dt class="text-sm font-semibold text-ink/70">
+        <%= a.labelBn || a.labelEn || a.key %>
+        <% if (a.labelEn && a.labelBn) { %><span class="block text-xs font-normal text-ink/40"><%= a.labelEn %></span><% } %>
+      </dt>
+      <dd class="sm:col-span-2">
+        <% if (val.trim() !== '') { %>
+          <span class="whitespace-pre-line text-ink"><%= val %></span>
+        <% } else { %>
+          <span class="text-ink/35">—</span>
+        <% } %>
+      </dd>
+    </div>
+    <% }); %>
+  </dl>
+  <% } %>
+</div>
+
+<div class="mt-6">
+  <form action="/admin/appointments/<%= appointment._id %>/delete" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত এই আবেদনটি মুছে ফেলতে চান?');">
+    <button type="submit" class="admin-btn-danger">এই আবেদনটি মুছে ফেলুন</button>
+  </form>
+</div>
+
+<%- include('../partials/admin-layout-bottom') %>

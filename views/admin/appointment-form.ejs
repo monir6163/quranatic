@@ -1,0 +1,81 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">অ্যাপয়েন্টমেন্ট ফর্ম বিল্ডার</h1>
+<p class="mt-1 text-sm text-ink/60">
+  নিচ থেকে ফর্মের ফিল্ড যোগ / পরিবর্তন / মুছুন। প্রতিটি ফিল্ডে বাংলা ও ইংরেজি লেবেল দিন।
+  <a href="/appointment" target="_blank" class="font-semibold text-primary-700 hover:underline">লাইভ ফর্ম দেখুন →</a>
+</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/appointment-form" method="POST" class="js-builder-form mt-6 space-y-6">
+
+  <!-- Page-level settings -->
+  <div class="admin-card space-y-5">
+    <h2 class="font-display text-lg font-bold text-primary-800">ফর্মের সাধারণ তথ্য</h2>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label class="admin-label">শিরোনাম (বাংলা)</label>
+        <input type="text" data-meta="titleBn" value="<%= form.titleBn %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">শিরোনাম (English)</label>
+        <input type="text" data-meta="titleEn" value="<%= form.titleEn %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">বিবরণ (বাংলা)</label>
+        <input type="text" data-meta="descriptionBn" value="<%= form.descriptionBn %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">বিবরণ (English)</label>
+        <input type="text" data-meta="descriptionEn" value="<%= form.descriptionEn %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">সাবমিট বাটন (বাংলা)</label>
+        <input type="text" data-meta="submitTextBn" value="<%= form.submitTextBn %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">সাবমিট বাটন (English)</label>
+        <input type="text" data-meta="submitTextEn" value="<%= form.submitTextEn %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">সফল বার্তা (বাংলা)</label>
+        <input type="text" data-meta="successBn" value="<%= form.successBn %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">সফল বার্তা (English)</label>
+        <input type="text" data-meta="successEn" value="<%= form.successEn %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">ডিফল্ট ভাষা</label>
+        <select data-meta="defaultLang" class="admin-input">
+          <option value="bn" <%= form.defaultLang === 'bn' ? 'selected' : '' %>>বাংলা</option>
+          <option value="en" <%= form.defaultLang === 'en' ? 'selected' : '' %>>English</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sections + fields are rendered here by the builder JS -->
+  <div id="builder" class="space-y-6"></div>
+
+  <input type="hidden" name="definition" class="js-builder-definition" />
+
+  <div class="sticky bottom-0 -mx-5 border-t border-primary-900/10 bg-canvas/90 px-5 py-3 backdrop-blur md:-mx-8 md:px-8">
+    <button type="submit" class="admin-btn">সম্পূর্ণ ফর্ম সংরক্ষণ করুন</button>
+  </div>
+</form>
+
+<!-- Current form definition (read by admin-form-builder.js) -->
+<script id="apptFormData" type="application/json"><%- JSON.stringify({
+  titleBn: form.titleBn, titleEn: form.titleEn,
+  descriptionBn: form.descriptionBn, descriptionEn: form.descriptionEn,
+  submitTextBn: form.submitTextBn, submitTextEn: form.submitTextEn,
+  successBn: form.successBn, successEn: form.successEn,
+  defaultLang: form.defaultLang,
+  sections: form.sections
+}).replace(/</g, '\\u003c') %></script>
+
+<script src="/js/admin-form-builder.js"></script>
+
+<%- include('../partials/admin-layout-bottom') %>

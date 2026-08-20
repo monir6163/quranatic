@@ -1,0 +1,88 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<%
+  function displayVal(v){
+    if (Array.isArray(v)) return v.join(', ');
+    return v == null ? '' : String(v);
+  }
+  function filledAnswers(answers){
+    return (answers || [])
+      .map(function(a){ return { label: a.labelBn || a.labelEn || a.key, val: displayVal(a.value).trim() }; })
+      .filter(function(a){ return a.val !== ''; });
+  }
+%>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">অ্যাপয়েন্টমেন্ট আবেদন</h1>
+<p class="mt-1 text-sm text-ink/60">অ্যাপয়েন্টমেন্ট ফর্ম থেকে যারা আবেদন করেছেন তাদের তালিকা।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/appointments" method="GET" class="admin-card mt-6 flex flex-wrap items-end gap-3">
+  <div class="min-w-[220px] flex-1">
+    <label class="admin-label">যেকোনো তথ্য দিয়ে সার্চ করুন</label>
+    <input type="text" name="q" value="<%= q %>" placeholder="যেমন: নাম, ফোন, এলাকা" class="admin-input" />
+  </div>
+  <button type="submit" class="admin-btn">সার্চ করুন</button>
+  <% if (q) { %>
+    <a href="/admin/appointments" class="admin-btn !bg-primary-100 !text-primary-800 hover:!bg-primary-200">রিসেট</a>
+  <% } %>
+</form>
+
+<div class="admin-card mt-6 overflow-x-auto p-0">
+  <table class="w-full min-w-[760px] text-left text-sm">
+    <thead>
+      <tr class="border-b border-primary-900/10 bg-primary-50 text-xs font-bold uppercase tracking-wide text-primary-800">
+        <th class="px-4 py-3">আবেদনকারীর তথ্য</th>
+        <th class="px-4 py-3">ভাষা</th>
+        <th class="px-4 py-3">তারিখ</th>
+        <th class="px-4 py-3 text-right">অ্যাকশন</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (!appointments.length) { %>
+      <tr>
+        <td colspan="4" class="px-4 py-8 text-center text-ink/50">
+          <% if (q) { %>
+            "<%= q %>" দিয়ে কোনো আবেদন পাওয়া যায়নি।
+          <% } else { %>
+            এখনো কোনো আবেদন আসেনি।
+          <% } %>
+        </td>
+      </tr>
+      <% } %>
+      <% appointments.forEach(function(a){ %>
+      <% var items = filledAnswers(a.answers); %>
+      <tr class="border-b border-primary-900/5 align-top hover:bg-primary-50/40">
+        <td class="px-4 py-3">
+          <% if (items.length) { %>
+            <div class="font-semibold text-ink"><%= items[0].val %></div>
+            <% items.slice(1, 3).forEach(function(it){ %>
+              <div class="text-xs text-ink/55"><span class="text-ink/40"><%= it.label %>:</span> <%= it.val %></div>
+            <% }); %>
+          <% } else { %>
+            <span class="text-ink/40">—</span>
+          <% } %>
+        </td>
+        <td class="px-4 py-3 whitespace-nowrap">
+          <span class="rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700"><%= a.language === 'en' ? 'English' : 'বাংলা' %></span>
+        </td>
+        <td class="px-4 py-3 whitespace-nowrap text-xs text-ink/60">
+          <%= new Date(a.createdAt).toLocaleDateString('bn-BD', { day: '2-digit', month: 'short', year: 'numeric' }) %><br />
+          <%= new Date(a.createdAt).toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }) %>
+        </td>
+        <td class="px-4 py-3 text-right">
+          <div class="flex items-center justify-end gap-2">
+            <a href="/admin/appointments/<%= a._id %>" class="admin-btn !px-4 !py-2 text-sm">বিস্তারিত</a>
+            <form action="/admin/appointments/<%= a._id %>/delete" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত এই আবেদনটি মুছে ফেলতে চান?');">
+              <input type="hidden" name="q" value="<%= q %>" />
+              <button type="submit" class="admin-btn-danger">মুছুন</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/admin-layout-bottom') %>

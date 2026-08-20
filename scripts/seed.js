@@ -2,6 +2,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const Admin = require("../models/Admin");
 const Content = require("../models/Content");
+const AppointmentForm = require("../models/AppointmentForm");
 
 async function seed() {
   const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/ruqyah_landing";
@@ -27,6 +28,14 @@ async function seed() {
     console.log("[seed] Created initial landing page content with defaults.");
   } else {
     console.log("[seed] Content document already exists, skipping.");
+  }
+
+  const existingForm = await AppointmentForm.findOne();
+  if (!existingForm) {
+    await AppointmentForm.getSingleton();
+    console.log("[seed] Created initial appointment form with default sections/fields.");
+  } else {
+    console.log("[seed] Appointment form already exists, skipping.");
   }
 
   await mongoose.disconnect();

@@ -58,3 +58,7 @@ h1, h2, h3, .font-display {
 .admin-card {
   @apply rounded-xl border border-primary-900/10 bg-white p-6 shadow-card;
 }
+
+/* Bilingual toggle: show only the active language's spans */
+[data-lang="bn"] .lang-en { display: none; }
+[data-lang="en"] .lang-bn { display: none; }

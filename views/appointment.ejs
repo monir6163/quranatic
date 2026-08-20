@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body class="min-h-screen bg-canvas font-body text-ink">
+  <%- include('partials/site-header') %>
+
+  <main class="mx-auto max-w-3xl px-4 py-10 md:py-14">
+    <div class="js-appt-wrap" data-lang="<%= form.defaultLang %>">
+
+      <!-- Heading + language toggle -->
+      <div class="text-center">
+        <h1 class="font-display text-2xl font-extrabold text-primary-900 sm:text-3xl">
+          <span class="lang-bn"><%= form.titleBn %></span><span class="lang-en"><%= form.titleEn %></span>
+        </h1>
+        <% if (form.descriptionBn || form.descriptionEn) { %>
+        <p class="mx-auto mt-2 max-w-xl text-sm text-ink/60">
+          <span class="lang-bn"><%= form.descriptionBn %></span><span class="lang-en"><%= form.descriptionEn %></span>
+        </p>
+        <% } %>
+
+        <div class="mt-5 inline-flex rounded-full border border-primary-900/15 bg-white p-1 text-sm font-semibold shadow-card">
+          <button type="button" class="js-lang-btn rounded-full px-5 py-1.5 transition" data-lang="bn">বাংলা</button>
+          <button type="button" class="js-lang-btn rounded-full px-5 py-1.5 transition" data-lang="en">English</button>
+        </div>
+      </div>
+
+      <% if (!form.sections.length) { %>
+        <p class="admin-card mt-8 text-center text-ink/60">
+          <span class="lang-bn">ফর্মটি এখনো তৈরি হয়নি।</span><span class="lang-en">This form has not been set up yet.</span>
+        </p>
+      <% } else { %>
+
+      <form class="js-appt-form mt-8" novalidate>
+        <div class="js-appt-fields space-y-6">
+          <% form.sections.forEach(function(section){ %>
+          <section class="admin-card">
+            <% if (section.titleBn || section.titleEn) { %>
+            <h2 class="mb-4 border-b border-primary-900/10 pb-2 font-display text-lg font-bold text-primary-800">
+              <span class="lang-bn"><%= section.titleBn %></span><span class="lang-en"><%= section.titleEn %></span>
+            </h2>
+            <% } %>
+
+            <div class="grid grid-cols-6 gap-4">
+              <% section.fields.forEach(function(field){ %>
+              <%
+                var span = field.width === 'half' ? 'sm:col-span-3' : (field.width === 'third' ? 'sm:col-span-2' : 'sm:col-span-6');
+                var reqStar = field.required ? '<span class="text-clay">*</span>' : '';
+              %>
+
+              <% if (field.type === 'note') { %>
+              <div class="col-span-6 <%= span %>">
+                <div class="rounded-lg border border-primary-900/10 bg-primary-50/60 p-4 text-sm leading-relaxed text-ink/75 whitespace-pre-line">
+                  <span class="lang-bn"><%= field.labelBn %></span><span class="lang-en"><%= field.labelEn %></span>
+                </div>
+              </div>
+
+              <% } else { %>
+              <div class="appt-field col-span-6 <%= span %>" data-key="<%= field.key %>" data-type="<%= field.type %>" data-required="<%= field.required ? '1' : '0' %>">
+
+                <% if (field.type !== 'checkbox') { %>
+                <label class="admin-label">
+                  <span class="lang-bn"><%= field.labelBn %></span><span class="lang-en"><%= field.labelEn %></span>
+                  <%- reqStar %>
+                </label>
+                <% } %>
+
+                <% if (['text','email','tel','number','date'].includes(field.type)) { %>
+                  <input
+                    type="<%= field.type %>"
+                    name="<%= field.key %>"
+                    class="admin-input js-appt-input"
+                    data-ph-bn="<%= field.placeholderBn %>"
+                    data-ph-en="<%= field.placeholderEn %>"
+                    placeholder="<%= field.placeholderBn %>"
+                    <%= field.type === 'tel' ? 'maxlength="11" inputmode="numeric"' : '' %>
+                  />
+
+                <% } else if (field.type === 'textarea') { %>
+                  <textarea
+                    name="<%= field.key %>"
+                    rows="3"
+                    class="admin-input js-appt-input"
+                    data-ph-bn="<%= field.placeholderBn %>"
+                    data-ph-en="<%= field.placeholderEn %>"
+                    placeholder="<%= field.placeholderBn %>"
+                  ></textarea>
+
+                <% } else if (field.type === 'select') { %>
+                  <select name="<%= field.key %>" class="admin-input js-appt-input">
+                    <option value="" data-bn="<%= field.placeholderBn || '— নির্বাচন করুন —' %>" data-en="<%= field.placeholderEn || '— Select —' %>"><%= field.placeholderBn || '— নির্বাচন করুন —' %></option>
+                    <% field.options.forEach(function(opt){ %>
+                    <option value="<%= opt.value %>" data-bn="<%= opt.labelBn %>" data-en="<%= opt.labelEn %>"><%= opt.labelBn %></option>
+                    <% }); %>
+                  </select>
+
+                <% } else if (field.type === 'radio') { %>
+                  <div class="grid gap-2 sm:grid-cols-2">
+                    <% field.options.forEach(function(opt){ %>
+                    <label class="flex cursor-pointer items-center gap-2.5 rounded-lg border border-primary-900/15 px-4 py-2.5 text-sm font-medium transition has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:ring-2 has-[:checked]:ring-primary-500/30">
+                      <input type="radio" name="<%= field.key %>" value="<%= opt.value %>" class="accent-primary-600" />
+                      <span><span class="lang-bn"><%= opt.labelBn %></span><span class="lang-en"><%= opt.labelEn %></span></span>
+                    </label>
+                    <% }); %>
+                  </div>
+
+                <% } else if (field.type === 'checkbox-group') { %>
+                  <div class="grid gap-2 sm:grid-cols-2">
+                    <% field.options.forEach(function(opt){ %>
+                    <label class="flex cursor-pointer items-center gap-2.5 rounded-lg border border-primary-900/15 px-4 py-2.5 text-sm font-medium transition has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:ring-2 has-[:checked]:ring-primary-500/30">
+                      <input type="checkbox" name="<%= field.key %>" value="<%= opt.value %>" class="accent-primary-600" />
+                      <span><span class="lang-bn"><%= opt.labelBn %></span><span class="lang-en"><%= opt.labelEn %></span></span>
+                    </label>
+                    <% }); %>
+                  </div>
+
+                <% } else if (field.type === 'checkbox') { %>
+                  <label class="flex cursor-pointer items-start gap-2.5 rounded-lg border border-primary-900/15 px-4 py-2.5 text-sm font-medium transition has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50">
+                    <input type="checkbox" name="<%= field.key %>" value="1" class="mt-0.5 accent-primary-600" />
+                    <span>
+                      <span class="lang-bn"><%= field.labelBn %></span><span class="lang-en"><%= field.labelEn %></span>
+                      <%- reqStar %>
+                    </span>
+                  </label>
+                <% } %>
+
+                <p class="appt-error mt-1 hidden text-xs font-semibold text-clay"></p>
+              </div>
+              <% } %>
+
+              <% }); %>
+            </div>
+          </section>
+          <% }); %>
+
+          <!-- honeypot (bots) -->
+          <input type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <p class="js-appt-submit-error hidden rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-clay"></p>
+
+          <button type="submit" class="js-appt-submit btn-primary w-full">
+            <span class="lang-bn"><%= form.submitTextBn %></span><span class="lang-en"><%= form.submitTextEn %></span>
+          </button>
+        </div>
+
+        <div class="js-appt-success hidden rounded-xl2 bg-primary-50 p-6 text-center">
+          <p class="font-display text-lg font-bold text-primary-700">✅</p>
+          <p class="mt-1 text-ink/80">
+            <span class="lang-bn"><%= form.successBn %></span><span class="lang-en"><%= form.successEn %></span>
+          </p>
+        </div>
+      </form>
+      <% } %>
+
+    </div>
+  </main>
+
+  <%- include('partials/site-footer') %>
+  <script src="/js/appointment.js"></script>
+</body>
+</html>
