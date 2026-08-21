@@ -35,7 +35,10 @@
       <form class="js-appt-form mt-8" novalidate>
         <div class="js-appt-fields space-y-6">
           <% form.sections.forEach(function(section){ %>
-          <section class="admin-card">
+          <%
+            var isPermSection = section.fields.some(function(f){ return f.key && f.key.indexOf('perm_') === 0; });
+          %>
+          <section class="admin-card<%= isPermSection ? ' js-perm-section hidden' : '' %>">
             <% if (section.titleBn || section.titleEn) { %>
             <h2 class="mb-4 border-b border-primary-900/10 pb-2 font-display text-lg font-bold text-primary-800">
               <span class="lang-bn"><%= section.titleBn %></span><span class="lang-en"><%= section.titleEn %></span>

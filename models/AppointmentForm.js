@@ -64,6 +64,48 @@ const DIVISION_OPTIONS = [
   { value: "mymensingh", labelBn: "ময়মনসিংহ", labelEn: "Mymensingh" }
 ];
 
+/* Checkbox that reveals the permanent-address section on the public form. */
+const ADD_PERMANENT_ADDRESS_FIELD = {
+  key: "add_permanent_address",
+  type: "checkbox",
+  labelBn: "স্থায়ী ঠিকানা যোগ করুন",
+  labelEn: "Add permanent address",
+  width: "full"
+};
+
+/* Permanent address mirrors the present-address fields (keys prefixed "perm_").
+   A factory so a fresh copy can be spliced into an already-seeded document. */
+function permanentAddressSection() {
+  return {
+    titleBn: "স্থায়ী ঠিকানা",
+    titleEn: "Permanent Address",
+    fields: [
+      {
+        key: "same_address",
+        type: "checkbox",
+        labelBn: "স্থায়ী ও বর্তমান ঠিকানা একই",
+        labelEn: "Permanent and present address are the same",
+        width: "full"
+      },
+      {
+        key: "perm_division",
+        type: "select",
+        labelBn: "বিভাগ",
+        labelEn: "Division",
+        placeholderBn: "বিভাগ নির্বাচন করুন",
+        placeholderEn: "Select a division",
+        width: "third",
+        options: DIVISION_OPTIONS
+      },
+      { key: "perm_district", type: "text", labelBn: "জেলা", labelEn: "District", width: "third" },
+      { key: "perm_upazila", type: "text", labelBn: "উপজেলা / থানা", labelEn: "Upazila / Thana", width: "third" },
+      { key: "perm_union_ward", type: "text", labelBn: "ইউনিয়ন / ওয়ার্ড", labelEn: "Union / Ward", width: "third" },
+      { key: "perm_village", type: "text", labelBn: "গ্রাম / এলাকা", labelEn: "Village / Area", width: "third" },
+      { key: "perm_house_road", type: "text", labelBn: "বাসা ও রোড নম্বর", labelEn: "House & Road No.", width: "third" }
+    ]
+  };
+}
+
 /* Default (seeded) form roughly matching the appointment-form mockup.
    Admin can freely add / edit / remove any of this from the panel. */
 const DEFAULT_SECTIONS = [
@@ -135,8 +177,8 @@ const DEFAULT_SECTIONS = [
     ]
   },
   {
-    titleBn: "ঠিকানা",
-    titleEn: "Address",
+    titleBn: "বর্তমান ঠিকানা",
+    titleEn: "Present Address",
     fields: [
       {
         key: "division",
@@ -183,15 +225,10 @@ const DEFAULT_SECTIONS = [
         labelEn: "House & Road No.",
         width: "third"
       },
-      {
-        key: "same_address",
-        type: "checkbox",
-        labelBn: "স্থায়ী ও বর্তমান ঠিকানা একই",
-        labelEn: "Permanent and present address are the same",
-        width: "full"
-      }
+      ADD_PERMANENT_ADDRESS_FIELD
     ]
   },
+  permanentAddressSection(),
   {
     titleBn: "সমস্যার বিবরণ",
     titleEn: "Problem Details",
@@ -294,7 +331,26 @@ const AppointmentFormSchema = new Schema(
 AppointmentFormSchema.statics.getSingleton = async function () {
   let doc = await this.findOne();
   if (!doc) {
-    doc = await this.create({});
+    return this.create({});
+  }
+
+  // Backfill: split a legacy single "Address" section into present + permanent
+  // with the add/same toggles. Idempotent, runs once per form.
+  const hasToggle = doc.sections.some((s) => s.fields.some((f) => f.key === "add_permanent_address"));
+  const hasPerm = doc.sections.some((s) => s.fields.some((f) => f.key === "perm_division"));
+  if (!hasToggle || !hasPerm) {
+    const idx = doc.sections.findIndex((s) => s.fields.some((f) => f.key === "division"));
+    if (idx !== -1) {
+      const present = doc.sections[idx];
+      present.titleBn = "বর্তমান ঠিকানা";
+      present.titleEn = "Present Address";
+      // drop the legacy "same" checkbox from the present block, ensure the toggle is last
+      present.fields = present.fields.filter((f) => f.key !== "same_address" && f.key !== "add_permanent_address");
+      present.fields.push({ ...ADD_PERMANENT_ADDRESS_FIELD });
+      if (!hasPerm) doc.sections.splice(idx + 1, 0, permanentAddressSection());
+      doc.markModified("sections");
+      await doc.save();
+    }
   }
   return doc;
 };

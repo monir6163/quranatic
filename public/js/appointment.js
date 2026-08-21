@@ -91,6 +91,66 @@
     return ctrl ? ctrl.value.trim() : "";
   }
 
+  /* ---- present / permanent address: "add permanent" toggle + "same as present" copy ---- */
+  (function () {
+    const addPermField = form.querySelector('.appt-field[data-key="add_permanent_address"]');
+    const permSection = form.querySelector(".js-perm-section");
+    if (!addPermField || !permSection) return;
+
+    const addPermCb = addPermField.querySelector('input[type="checkbox"]');
+    const sameCb = permSection.querySelector('.appt-field[data-key="same_address"] input[type="checkbox"]');
+    const permInputFields = [...permSection.querySelectorAll(".appt-field")].filter(
+      (f) => f.dataset.key && f.dataset.key.indexOf("perm_") === 0
+    );
+    if (!addPermCb || !permInputFields.length) return;
+
+    const ctrlOf = (field) => field && field.querySelector("input, textarea, select");
+    const presentFieldFor = (permKey) =>
+      form.querySelector('.appt-field[data-key="' + permKey.replace(/^perm_/, "") + '"]');
+
+    function copyPresentToPerm() {
+      permInputFields.forEach((pf) => {
+        const src = ctrlOf(presentFieldFor(pf.dataset.key));
+        const dst = ctrlOf(pf);
+        if (src && dst) dst.value = src.value;
+      });
+    }
+
+    function apply() {
+      const show = addPermCb.checked;
+      permSection.classList.toggle("hidden", !show);
+      if (!show && sameCb) sameCb.checked = false;
+
+      const same = !!(sameCb && sameCb.checked);
+      if (same) copyPresentToPerm();
+
+      permInputFields.forEach((pf) => {
+        pf.classList.toggle("hidden", same); // "same" collapses the inputs (present data is copied instead)
+        clearError(pf);
+        if (!show) {
+          const dst = ctrlOf(pf); // permanent not wanted → don't submit stale data
+          if (dst) dst.value = "";
+        }
+      });
+    }
+
+    addPermCb.addEventListener("change", apply);
+    if (sameCb) sameCb.addEventListener("change", apply);
+
+    // keep the permanent copy in sync while "same" is on and present is edited
+    permInputFields.forEach((pf) => {
+      const src = ctrlOf(presentFieldFor(pf.dataset.key));
+      if (!src) return;
+      const sync = () => {
+        if (addPermCb.checked && sameCb && sameCb.checked) copyPresentToPerm();
+      };
+      src.addEventListener("input", sync);
+      src.addEventListener("change", sync);
+    });
+
+    apply();
+  })();
+
   function validate(values) {
     let valid = true;
     fields.forEach((field) => {
