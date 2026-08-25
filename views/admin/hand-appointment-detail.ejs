@@ -1,0 +1,86 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <h1 class="font-display text-2xl font-bold text-primary-900">আবেদনের বিস্তারিত</h1>
+    <p class="mt-1 text-sm text-ink/60">
+      <%= new Date(submission.createdAt).toLocaleDateString('bn-BD', { day: '2-digit', month: 'long', year: 'numeric' }) %>,
+      <%= new Date(submission.createdAt).toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }) %>
+      ·
+      <% if (submission.verified) { %>
+        <span class="font-semibold text-primary-700">✓ যাচাইকৃত</span>
+      <% } else { %>
+        <span class="font-semibold text-gold-600">পেমেন্ট অপেক্ষমাণ</span>
+      <% } %>
+    </p>
+  </div>
+  <a href="/admin/hand-appointments" class="admin-btn !bg-primary-100 !text-primary-800 hover:!bg-primary-200">← তালিকায় ফিরুন</a>
+</div>
+
+<%- include('../partials/admin-flash') %>
+
+<!-- Hand images -->
+<div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <div class="admin-card">
+    <h2 class="mb-3 font-display text-base font-bold text-primary-800">ডান হাত</h2>
+    <% if (submission.rightHandImage) { %>
+      <a href="<%= submission.rightHandImage %>" target="_blank">
+        <img src="<%= submission.rightHandImage %>" class="w-full rounded-lg object-contain ring-1 ring-primary-900/10" />
+      </a>
+    <% } else { %>
+      <p class="text-sm text-ink/40">ছবি নেই।</p>
+    <% } %>
+  </div>
+  <div class="admin-card">
+    <h2 class="mb-3 font-display text-base font-bold text-primary-800">বাম হাত</h2>
+    <% if (submission.leftHandImage) { %>
+      <a href="<%= submission.leftHandImage %>" target="_blank">
+        <img src="<%= submission.leftHandImage %>" class="w-full rounded-lg object-contain ring-1 ring-primary-900/10" />
+      </a>
+    <% } else { %>
+      <p class="text-sm text-ink/40">ছবি নেই।</p>
+    <% } %>
+  </div>
+</div>
+
+<!-- Details -->
+<div class="admin-card mt-4 p-0">
+  <dl class="divide-y divide-primary-900/5">
+    <% var rows = [
+      { label: 'নাম', val: submission.name },
+      { label: 'মোবাইল নম্বর', val: submission.phone },
+      { label: 'হাদিয়া', val: '৳' + submission.charge },
+      { label: 'পেমেন্ট মাধ্যম', val: submission.paymentMethod },
+      { label: 'ট্রানজেকশন আইডি', val: submission.transactionId },
+      { label: 'প্রেরকের নম্বর', val: submission.senderNumber }
+    ]; %>
+    <% rows.forEach(function(r){ %>
+    <div class="grid gap-1 px-5 py-4 sm:grid-cols-3 sm:gap-4">
+      <dt class="text-sm font-semibold text-ink/70"><%= r.label %></dt>
+      <dd class="sm:col-span-2">
+        <% if (r.val !== undefined && r.val !== null && String(r.val).trim() !== '') { %>
+          <span class="text-ink"><%= r.val %></span>
+        <% } else { %>
+          <span class="text-ink/35">—</span>
+        <% } %>
+      </dd>
+    </div>
+    <% }); %>
+  </dl>
+</div>
+
+<!-- Actions -->
+<div class="mt-6 flex flex-wrap items-center gap-3">
+  <form action="/admin/hand-appointments/<%= submission._id %>/toggle" method="POST">
+    <% if (submission.verified) { %>
+      <button type="submit" class="admin-btn !bg-primary-100 !text-primary-800 hover:!bg-primary-200">যাচাই বাতিল করুন</button>
+    <% } else { %>
+      <button type="submit" class="admin-btn">✓ পেমেন্ট যাচাইকৃত হিসেবে চিহ্নিত করুন</button>
+    <% } %>
+  </form>
+  <form action="/admin/hand-appointments/<%= submission._id %>/delete" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত এই আবেদনটি মুছে ফেলতে চান?');">
+    <button type="submit" class="admin-btn-danger">এই আবেদনটি মুছে ফেলুন</button>
+  </form>
+</div>
+
+<%- include('../partials/admin-layout-bottom') %>

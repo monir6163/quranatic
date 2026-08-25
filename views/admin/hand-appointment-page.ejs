@@ -1,0 +1,102 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <h1 class="font-display text-2xl font-bold text-primary-900">হাত অ্যাপয়েন্টমেন্ট পেজ</h1>
+    <p class="mt-1 text-sm text-ink/60">/hand-appointment পেজের সব লেখা, হাদিয়া ও পেমেন্ট তথ্য এখান থেকে পরিবর্তন করুন।</p>
+  </div>
+  <a href="/hand-appointment" target="_blank" class="admin-btn !bg-primary-100 !text-primary-800 hover:!bg-primary-200">পেজটি দেখুন ↗</a>
+</div>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/hand-appointment-page" method="POST" class="mt-6 space-y-6">
+
+  <section class="admin-card space-y-5">
+    <h2 class="font-display text-lg font-bold text-primary-800">পেজের কন্টেন্ট</h2>
+    <div>
+      <label class="admin-label">পেজ শিরোনাম</label>
+      <input type="text" name="title" value="<%= page.title %>" class="admin-input" />
+    </div>
+    <div>
+      <label class="admin-label">বিবরণ</label>
+      <textarea name="description" rows="3" class="admin-input"><%= page.description %></textarea>
+    </div>
+    <div>
+      <label class="admin-label">নির্দেশনা <span class="font-normal text-ink/40">(প্রতি লাইনে একটি করে)</span></label>
+      <textarea name="instructions" rows="4" class="admin-input"><%= page.instructions %></textarea>
+    </div>
+  </section>
+
+  <section class="admin-card space-y-5">
+    <h2 class="font-display text-lg font-bold text-primary-800">হাদিয়া ও পেমেন্ট</h2>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label class="admin-label">হাদিয়া (৳)</label>
+        <input type="number" name="charge" value="<%= page.charge %>" min="0" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">সেন্ড মানি নম্বর</label>
+        <input type="text" name="paymentNumber" value="<%= page.paymentNumber %>" class="admin-input" />
+      </div>
+    </div>
+    <div>
+      <label class="admin-label">পেমেন্ট মাধ্যমসমূহ <span class="font-normal text-ink/40">(প্রতি লাইনে একটি করে — যেমন: বিকাশ, নগদ)</span></label>
+      <textarea name="paymentMethodsRaw" rows="3" class="admin-input"><%= page.paymentMethodsRaw %></textarea>
+    </div>
+    <div>
+      <label class="admin-label">পেমেন্ট নির্দেশনা</label>
+      <textarea name="paymentInstructions" rows="3" class="admin-input"><%= page.paymentInstructions %></textarea>
+    </div>
+  </section>
+
+  <section class="admin-card space-y-5">
+    <h2 class="font-display text-lg font-bold text-primary-800">ফর্ম ফিল্ডের লেবেল</h2>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label class="admin-label">নাম ফিল্ড</label>
+        <input type="text" name="nameLabel" value="<%= page.nameLabel %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">মোবাইল ফিল্ড</label>
+        <input type="text" name="phoneLabel" value="<%= page.phoneLabel %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">ডান হাতের ছবি লেবেল</label>
+        <input type="text" name="rightHandLabel" value="<%= page.rightHandLabel %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">বাম হাতের ছবি লেবেল</label>
+        <input type="text" name="leftHandLabel" value="<%= page.leftHandLabel %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">পেমেন্ট মাধ্যম লেবেল</label>
+        <input type="text" name="paymentMethodLabel" value="<%= page.paymentMethodLabel %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">ট্রানজেকশন আইডি লেবেল</label>
+        <input type="text" name="trxIdLabel" value="<%= page.trxIdLabel %>" class="admin-input" />
+      </div>
+      <div>
+        <label class="admin-label">প্রেরকের নম্বর লেবেল</label>
+        <input type="text" name="senderNumberLabel" value="<%= page.senderNumberLabel %>" class="admin-input" />
+      </div>
+    </div>
+  </section>
+
+  <section class="admin-card space-y-5">
+    <h2 class="font-display text-lg font-bold text-primary-800">বাটন ও সফলতার বার্তা</h2>
+    <div>
+      <label class="admin-label">সাবমিট বাটনের টেক্সট</label>
+      <input type="text" name="submitText" value="<%= page.submitText %>" class="admin-input" />
+    </div>
+    <div>
+      <label class="admin-label">জমা দেওয়ার পর সফলতার বার্তা</label>
+      <textarea name="successMessage" rows="3" class="admin-input"><%= page.successMessage %></textarea>
+    </div>
+  </section>
+
+  <button type="submit" class="admin-btn">সংরক্ষণ করুন</button>
+</form>
+
+<%- include('../partials/admin-layout-bottom') %>

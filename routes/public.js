@@ -1,9 +1,13 @@
 const express = require("express");
+const fs = require("fs");
 const router = express.Router();
 const Content = require("../models/Content");
 const Order = require("../models/Order");
 const AppointmentForm = require("../models/AppointmentForm");
 const Appointment = require("../models/Appointment");
+const HandAppointmentPage = require("../models/HandAppointmentPage");
+const HandAppointment = require("../models/HandAppointment");
+const upload = require("../middleware/upload");
 
 function toList(raw) {
   return (raw || "")
@@ -32,6 +36,16 @@ router.get("/appointment", async (req, res, next) => {
     const content = await Content.getSingleton();
     const form = await AppointmentForm.getSingleton();
     res.render("appointment", { content, form });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/hand-appointment", async (req, res, next) => {
+  try {
+    const content = await Content.getSingleton();
+    const page = await HandAppointmentPage.getSingleton();
+    res.render("hand-appointment", { content, page, methods: toList(page.paymentMethodsRaw) });
   } catch (err) {
     next(err);
   }
@@ -198,6 +212,69 @@ router.post("/api/appointments", async (req, res) => {
     console.error(err);
     res.status(500).json({ ok: false, message: "সার্ভারে সমস্যা হয়েছে।" });
   }
+});
+
+/* ---- Hand appointment: two image uploads + payment proof ---- */
+const handUpload = upload.fields([
+  { name: "rightHand", maxCount: 1 },
+  { name: "leftHand", maxCount: 1 }
+]);
+
+router.post("/api/hand-appointments", (req, res) => {
+  handUpload(req, res, async (uploadErr) => {
+    const files = (req.files && [].concat(req.files.rightHand || [], req.files.leftHand || [])) || [];
+    const cleanupUploads = () => files.forEach((f) => f && fs.unlink(f.path, () => {}));
+
+    try {
+      if (uploadErr) {
+        cleanupUploads();
+        return res.status(400).json({ ok: false, message: uploadErr.message || "ছবি আপলোডে সমস্যা হয়েছে।" });
+      }
+
+      const page = await HandAppointmentPage.getSingleton();
+      const methods = toList(page.paymentMethodsRaw);
+
+      const name = String(req.body.name || "").trim();
+      const phone = String(req.body.phone || "").trim().replace(/[\s-]/g, "");
+      const paymentMethod = String(req.body.paymentMethod || "").trim();
+      const transactionId = String(req.body.transactionId || "").trim();
+      const senderNumber = String(req.body.senderNumber || "").trim().replace(/[\s-]/g, "");
+
+      const rightFile = req.files && req.files.rightHand && req.files.rightHand[0];
+      const leftFile = req.files && req.files.leftHand && req.files.leftHand[0];
+
+      const errors = {};
+      if (!name || name.length < 2) errors.name = "সঠিক নাম দিন।";
+      if (!BD_PHONE_RE.test(phone)) errors.phone = "সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন।";
+      if (!rightFile) errors.rightHand = "ডান হাতের ছবি আপলোড করুন।";
+      if (!leftFile) errors.leftHand = "বাম হাতের ছবি আপলোড করুন।";
+      if (methods.length && !methods.includes(paymentMethod)) errors.paymentMethod = "পেমেন্ট মাধ্যম নির্বাচন করুন।";
+      if (!transactionId) errors.transactionId = "ট্রানজেকশন আইডি দিন।";
+      if (!BD_PHONE_RE.test(senderNumber)) errors.senderNumber = "সঠিক ১১ ডিজিটের নম্বর দিন।";
+
+      if (Object.keys(errors).length) {
+        cleanupUploads();
+        return res.status(400).json({ ok: false, message: "দয়া করে চিহ্নিত ঘরগুলো ঠিক করুন।", errors });
+      }
+
+      await HandAppointment.create({
+        name,
+        phone,
+        rightHandImage: `/uploads/${rightFile.filename}`,
+        leftHandImage: `/uploads/${leftFile.filename}`,
+        charge: page.charge,
+        paymentMethod,
+        transactionId,
+        senderNumber
+      });
+
+      res.json({ ok: true, message: page.successMessage });
+    } catch (err) {
+      console.error(err);
+      cleanupUploads();
+      res.status(500).json({ ok: false, message: "সার্ভারে সমস্যা হয়েছে।" });
+    }
+  });
 });
 
 module.exports = router;

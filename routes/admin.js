@@ -1,14 +1,25 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const router = express.Router();
 const Admin = require("../models/Admin");
 const Content = require("../models/Content");
 const Order = require("../models/Order");
 const AppointmentForm = require("../models/AppointmentForm");
 const Appointment = require("../models/Appointment");
+const HandAppointmentPage = require("../models/HandAppointmentPage");
+const HandAppointment = require("../models/HandAppointment");
 const upload = require("../middleware/upload");
 const { requireAdmin, redirectIfLoggedIn } = require("../middleware/auth");
 
 const asArray = (v) => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
+
+// Best-effort removal of an uploaded file given its stored "/uploads/x" path.
+const UPLOAD_DIR = path.join(__dirname, "..", "public", "uploads");
+function removeUpload(storedPath) {
+  if (!storedPath) return;
+  fs.unlink(path.join(UPLOAD_DIR, path.basename(storedPath)), () => {});
+}
 
 /* ---- Appointment form-builder definition helpers ---- */
 const FIELD_TYPES = [
@@ -239,6 +250,109 @@ router.post("/appointments/:id/delete", requireAdmin, async (req, res, next) => 
     req.flash("success", "আবেদনটি মুছে ফেলা হয়েছে।");
     const q = (req.body.q || "").trim();
     res.redirect("/admin/appointments" + (q ? "?q=" + encodeURIComponent(q) : ""));
+  } catch (err) {
+    next(err);
+  }
+});
+
+/* ---------------- HAND APPOINTMENT PAGE (content) ---------------- */
+
+router.get("/hand-appointment-page", requireAdmin, async (req, res, next) => {
+  try {
+    const page = await HandAppointmentPage.getSingleton();
+    res.render("admin/hand-appointment-page", { page, active: "handAppointmentPage" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/hand-appointment-page", requireAdmin, async (req, res, next) => {
+  try {
+    const page = await HandAppointmentPage.getSingleton();
+    const b = req.body;
+    Object.assign(page, {
+      title: b.title,
+      description: b.description,
+      instructions: b.instructions,
+      charge: Math.max(0, parseInt(b.charge, 10) || 0),
+      paymentNumber: b.paymentNumber,
+      paymentMethodsRaw: b.paymentMethodsRaw,
+      paymentInstructions: b.paymentInstructions,
+      nameLabel: b.nameLabel,
+      phoneLabel: b.phoneLabel,
+      rightHandLabel: b.rightHandLabel,
+      leftHandLabel: b.leftHandLabel,
+      paymentMethodLabel: b.paymentMethodLabel,
+      trxIdLabel: b.trxIdLabel,
+      senderNumberLabel: b.senderNumberLabel,
+      submitText: b.submitText,
+      successMessage: b.successMessage
+    });
+    await page.save();
+    req.flash("success", "হাত অ্যাপয়েন্টমেন্ট পেজ আপডেট হয়েছে।");
+    res.redirect("/admin/hand-appointment-page");
+  } catch (err) {
+    next(err);
+  }
+});
+
+/* ---------------- HAND APPOINTMENT SUBMISSIONS ---------------- */
+
+router.get("/hand-appointments", requireAdmin, async (req, res, next) => {
+  try {
+    const phone = (req.query.phone || "").trim();
+    const filter = phone
+      ? { phone: { $regex: phone.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } }
+      : {};
+    const submissions = await HandAppointment.find(filter).sort({ createdAt: -1 });
+    res.render("admin/hand-appointments", { submissions, phone, active: "handAppointments" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/hand-appointments/:id", requireAdmin, async (req, res, next) => {
+  try {
+    if (!/^[0-9a-fA-F]{24}$/.test(req.params.id)) {
+      req.flash("error", "আবেদনটি পাওয়া যায়নি।");
+      return res.redirect("/admin/hand-appointments");
+    }
+    const submission = await HandAppointment.findById(req.params.id);
+    if (!submission) {
+      req.flash("error", "আবেদনটি পাওয়া যায়নি।");
+      return res.redirect("/admin/hand-appointments");
+    }
+    res.render("admin/hand-appointment-detail", { submission, active: "handAppointments" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/hand-appointments/:id/toggle", requireAdmin, async (req, res, next) => {
+  try {
+    const submission = await HandAppointment.findById(req.params.id);
+    if (submission) {
+      submission.verified = !submission.verified;
+      await submission.save();
+      req.flash("success", submission.verified ? "পেমেন্ট যাচাইকৃত হিসেবে চিহ্নিত হয়েছে।" : "যাচাই বাতিল করা হয়েছে।");
+    }
+    res.redirect("/admin/hand-appointments/" + req.params.id);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/hand-appointments/:id/delete", requireAdmin, async (req, res, next) => {
+  try {
+    const submission = await HandAppointment.findById(req.params.id);
+    if (submission) {
+      removeUpload(submission.rightHandImage);
+      removeUpload(submission.leftHandImage);
+      await submission.deleteOne();
+    }
+    req.flash("success", "আবেদনটি মুছে ফেলা হয়েছে।");
+    const phone = (req.body.phone || "").trim();
+    res.redirect("/admin/hand-appointments" + (phone ? "?phone=" + encodeURIComponent(phone) : ""));
   } catch (err) {
     next(err);
   }

@@ -1,0 +1,89 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">হাত অ্যাপয়েন্টমেন্ট আবেদন</h1>
+<p class="mt-1 text-sm text-ink/60">/hand-appointment পেজ থেকে যারা ছবি ও পেমেন্ট জমা দিয়েছেন তাদের তালিকা।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<form action="/admin/hand-appointments" method="GET" class="admin-card mt-6 flex flex-wrap items-end gap-3">
+  <div class="min-w-[220px] flex-1">
+    <label class="admin-label">মোবাইল নাম্বার দিয়ে সার্চ করুন</label>
+    <input type="text" name="phone" value="<%= phone %>" placeholder="যেমন: 017" class="admin-input" />
+  </div>
+  <button type="submit" class="admin-btn">সার্চ করুন</button>
+  <% if (phone) { %>
+    <a href="/admin/hand-appointments" class="admin-btn !bg-primary-100 !text-primary-800 hover:!bg-primary-200">রিসেট</a>
+  <% } %>
+</form>
+
+<div class="admin-card mt-6 overflow-x-auto p-0">
+  <table class="w-full min-w-[860px] text-left text-sm">
+    <thead>
+      <tr class="border-b border-primary-900/10 bg-primary-50 text-xs font-bold uppercase tracking-wide text-primary-800">
+        <th class="px-4 py-3">আবেদনকারী</th>
+        <th class="px-4 py-3">ছবি</th>
+        <th class="px-4 py-3">পেমেন্ট</th>
+        <th class="px-4 py-3">স্ট্যাটাস</th>
+        <th class="px-4 py-3">তারিখ</th>
+        <th class="px-4 py-3 text-right">অ্যাকশন</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (!submissions.length) { %>
+      <tr>
+        <td colspan="6" class="px-4 py-8 text-center text-ink/50">
+          <% if (phone) { %>
+            "<%= phone %>" নাম্বার দিয়ে কোনো আবেদন পাওয়া যায়নি।
+          <% } else { %>
+            এখনো কোনো আবেদন আসেনি।
+          <% } %>
+        </td>
+      </tr>
+      <% } %>
+      <% submissions.forEach(function(s){ %>
+      <tr class="border-b border-primary-900/5 align-top hover:bg-primary-50/40">
+        <td class="px-4 py-3">
+          <div class="font-semibold text-ink"><%= s.name %></div>
+          <div class="text-xs text-ink/55"><%= s.phone %></div>
+        </td>
+        <td class="px-4 py-3">
+          <div class="flex gap-1.5">
+            <% [s.rightHandImage, s.leftHandImage].forEach(function(img){ %>
+              <% if (img) { %>
+                <a href="<%= img %>" target="_blank"><img src="<%= img %>" class="h-12 w-12 rounded-md object-cover ring-1 ring-primary-900/10" /></a>
+              <% } %>
+            <% }); %>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-xs text-ink/70">
+          <div class="font-semibold text-ink/85">৳<%= s.charge %> · <%= s.paymentMethod || '—' %></div>
+          <div><span class="text-ink/40">TrxID:</span> <%= s.transactionId || '—' %></div>
+          <div><span class="text-ink/40">প্রেরক:</span> <%= s.senderNumber || '—' %></div>
+        </td>
+        <td class="px-4 py-3 whitespace-nowrap">
+          <% if (s.verified) { %>
+            <span class="rounded-full bg-primary-100 px-2.5 py-1 text-xs font-semibold text-primary-700">✓ যাচাইকৃত</span>
+          <% } else { %>
+            <span class="rounded-full bg-gold-50 px-2.5 py-1 text-xs font-semibold text-gold-600 ring-1 ring-gold-200">অপেক্ষমাণ</span>
+          <% } %>
+        </td>
+        <td class="px-4 py-3 whitespace-nowrap text-xs text-ink/60">
+          <%= new Date(s.createdAt).toLocaleDateString('bn-BD', { day: '2-digit', month: 'short', year: 'numeric' }) %><br />
+          <%= new Date(s.createdAt).toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }) %>
+        </td>
+        <td class="px-4 py-3 text-right">
+          <div class="flex items-center justify-end gap-2">
+            <a href="/admin/hand-appointments/<%= s._id %>" class="admin-btn !px-4 !py-2 text-sm">বিস্তারিত</a>
+            <form action="/admin/hand-appointments/<%= s._id %>/delete" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত এই আবেদনটি মুছে ফেলতে চান?');">
+              <input type="hidden" name="phone" value="<%= phone %>" />
+              <button type="submit" class="admin-btn-danger">মুছুন</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/admin-layout-bottom') %>
