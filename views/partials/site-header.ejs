@@ -6,7 +6,7 @@
       <% } else { %>
         <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600 text-lg text-gold-100">﷽</span>
       <% } %>
-      <span class="leading-tight">
+      <span class="leading-tight md:block">
         <span class="block font-display text-[15px] font-bold text-primary-800 sm:text-base"><%= content.siteSettings.siteName %></span>
         <span class="hidden text-[11px] text-ink/50 sm:block"><%= content.siteSettings.tagline %></span>
       </span>
@@ -22,7 +22,7 @@
     </nav>
     <div class="flex items-center gap-2.5">
 
-      <a href="/appointment" class="inline-flex items-center justify-center rounded-full bg-primary-600 px-3.5 py-2 text-xs font-bold text-white shadow-md transition hover:bg-primary-700 sm:text-sm">
+      <a href="/appointment" class="hidden items-center justify-center rounded-full bg-primary-600 px-3.5 py-2 text-xs font-bold text-white shadow-md transition hover:bg-primary-700 sm:text-sm md:inline-flex">
         অ্যাপয়েন্টমেন্ট
       </a>
 
@@ -30,6 +30,7 @@
   href="https://www.facebook.com/share/1BnchvNw64/"
   target="_blank"
   rel="noopener noreferrer"
+  aria-label="Facebook"
   class="flex h-11 w-11 items-center justify-center rounded-full bg-[#1877F2] p-3 text-white shadow-md transition hover:bg-[#166FE5] hover:shadow-lg"
 >
   <svg
@@ -41,6 +42,82 @@
     <path d="M22.675 0H1.325C.593 0 0 .593 0 1.326v21.348C0 23.407.593 24 1.325 24H12.82v-9.294H9.692V11.41h3.128V8.797c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.796.715-1.796 1.763v2.31h3.587l-.467 3.296h-3.12V24h6.116C23.407 24 24 23.407 24 22.674V1.326C24 .593 23.407 0 22.675 0z"/>
   </svg>
 </a>
+
+      <!-- Mobile menu toggle -->
+      <button
+        type="button"
+        class="js-nav-toggle inline-flex h-10 w-10 items-center justify-center rounded-full text-primary-800 transition hover:bg-primary-50 md:hidden"
+        aria-label="মেনু"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+      >
+        <svg class="js-nav-icon-open h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg class="js-nav-icon-close hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
   </div>
+
+  <!-- Mobile nav panel -->
+  <nav id="mobile-nav" class="js-mobile-nav hidden border-t border-primary-900/10 bg-canvas/95 backdrop-blur-md md:hidden">
+    <div class="mx-auto max-w-6xl px-5 py-4">
+      <div class="flex flex-col gap-1 text-sm font-semibold text-ink/80">
+        <a href="/#problems" class="rounded-lg px-3 py-2.5 transition hover:bg-primary-50 hover:text-primary-700">সমস্যা</a>
+        <a href="/#solution" class="rounded-lg px-3 py-2.5 transition hover:bg-primary-50 hover:text-primary-700">সমাধান</a>
+        <a href="/#faq" class="rounded-lg px-3 py-2.5 transition hover:bg-primary-50 hover:text-primary-700">প্রশ্নোত্তর</a>
+        <a href="/#testimonials" class="rounded-lg px-3 py-2.5 transition hover:bg-primary-50 hover:text-primary-700">রিভিউ</a>
+      </div>
+      <div class="mt-3 flex flex-col gap-2.5 border-t border-primary-900/10 pt-4">
+        <a href="/appointment" class="flex items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-3 text-sm font-bold text-white shadow-md transition hover:bg-primary-700">
+          <span aria-hidden="true">📅</span> অ্যাপয়েন্টমেন্ট
+        </a>
+        <a href="/hand-appointment" class="flex items-center justify-center gap-2 rounded-full border-2 border-primary-600 px-4 py-3 text-sm font-bold text-primary-700 transition hover:bg-primary-600 hover:text-white">
+          <span aria-hidden="true">🖐️</span> হাতের ছবি অ্যাপয়েন্টমেন্ট
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <script>
+    (function () {
+      var btn = document.querySelector('.js-nav-toggle');
+      var panel = document.getElementById('mobile-nav');
+      if (!btn || !panel) return;
+      var iconOpen = btn.querySelector('.js-nav-icon-open');
+      var iconClose = btn.querySelector('.js-nav-icon-close');
+
+      function setOpen(open) {
+        panel.classList.toggle('hidden', !open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (iconOpen) iconOpen.classList.toggle('hidden', open);
+        if (iconClose) iconClose.classList.toggle('hidden', !open);
+      }
+
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setOpen(panel.classList.contains('hidden'));
+      });
+
+      panel.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', function () { setOpen(false); });
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!panel.classList.contains('hidden') && !panel.contains(e.target) && !btn.contains(e.target)) {
+          setOpen(false);
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setOpen(false);
+      });
+
+      window.addEventListener('resize', function () {
+        if (window.innerWidth >= 768) setOpen(false);
+      });
+    })();
+  </script>
 </header>
