@@ -95,7 +95,7 @@ router.post("/api/orders", async (req, res) => {
         .json({ ok: false, message: "সঠিক ডেলিভারি এলাকা নির্বাচন করুন।" });
     }
 
-    const order = await Order.create({
+    const orderData = {
       name: cleanName,
       phone: cleanPhone,
       address: cleanAddress,
@@ -103,18 +103,19 @@ router.post("/api/orders", async (req, res) => {
       deliveryCharge: cleanDeliveryCharge,
       deliveryLabel: deliveryLabel || "",
       total: cleanHadiya + cleanDeliveryCharge,
-    });
+    };
 
-    // Online payment mode → open a gateway charge and hand the URL to the browser.
-    // COD (default) keeps the original inline-success behavior.
+    // Online payment mode → open a gateway charge WITHOUT saving the order yet.
+    // The order is created only after payment is verified, so a canceled/abandoned
+    // payment never lands in the admin panel. COD (default) saves immediately.
     const content = await Content.getSingleton();
-    if (content.siteSettings.orderPaymentMode === "gateway" && order.total > 0) {
+    if (content.siteSettings.orderPaymentMode === "gateway" && orderData.total > 0) {
       try {
         const { payment_url } = await startCharge({
           req,
           targetType: "Order",
-          targetDoc: order,
-          amount: order.total,
+          pendingData: orderData,
+          amount: orderData.total,
           fullName: cleanName,
           phone: cleanPhone
         });
@@ -124,6 +125,7 @@ router.post("/api/orders", async (req, res) => {
       }
     }
 
+    const order = await Order.create(orderData);
     res.json({ ok: true, id: order._id });
   } catch (err) {
     console.error(err);
@@ -227,10 +229,9 @@ router.post("/api/appointments", async (req, res) => {
       });
     }
 
-    const appointment = await Appointment.create({ language: lang, answers });
-
-    // Online payment mode → charge form.charge and redirect to the gateway.
-    // When disabled (default) the flow is unchanged (inline success message).
+    // Online payment mode → charge form.charge and redirect to the gateway WITHOUT
+    // saving the appointment yet; it is created only after payment is verified.
+    // When disabled (default) the appointment is saved now (inline success message).
     if (form.paymentEnabled && form.charge > 0) {
       const strAnswer = (a) => (a && typeof a.value === "string" ? a.value.trim() : "");
       const telAns = answers.find((a) => a.type === "tel" && strAnswer(a));
@@ -242,7 +243,7 @@ router.post("/api/appointments", async (req, res) => {
         const { payment_url } = await startCharge({
           req,
           targetType: "Appointment",
-          targetDoc: appointment,
+          pendingData: { language: lang, answers },
           amount: form.charge,
           fullName: nameAns ? strAnswer(nameAns) : "",
           email: emailAns ? strAnswer(emailAns) : "",
@@ -256,6 +257,7 @@ router.post("/api/appointments", async (req, res) => {
       }
     }
 
+    await Appointment.create({ language: lang, answers });
     res.json({ ok: true, message: lang === "en" ? form.successEn : form.successBn });
   } catch (err) {
     console.error(err);
@@ -311,33 +313,41 @@ router.post("/api/hand-appointments", (req, res) => {
         return res.status(400).json({ ok: false, message: "দয়া করে চিহ্নিত ঘরগুলো ঠিক করুন।", errors });
       }
 
-      const submission = await HandAppointment.create({
-        name,
-        phone,
-        rightHandImage: `/uploads/${rightFile.filename}`,
-        leftHandImage: `/uploads/${leftFile.filename}`,
-        charge: page.charge,
-        paymentMethod: gateway ? "" : paymentMethod,
-        transactionId: gateway ? "" : transactionId,
-        senderNumber: gateway ? "" : senderNumber
-      });
+      const rightHandImage = `/uploads/${rightFile.filename}`;
+      const leftHandImage = `/uploads/${leftFile.filename}`;
 
-      // Gateway mode → open a charge and redirect; manual mode is unchanged.
+      // Gateway mode → open a charge and redirect WITHOUT saving the submission yet;
+      // it is created (verified) only after payment is confirmed, so an abandoned
+      // payment never appears in the admin panel. The uploaded images stay on disk
+      // and are attached to the record on success.
       if (gateway) {
         try {
           const { payment_url } = await startCharge({
             req,
             targetType: "HandAppointment",
-            targetDoc: submission,
+            pendingData: { name, phone, rightHandImage, leftHandImage, charge: page.charge },
             amount: page.charge,
             fullName: name,
             phone
           });
           return res.json({ ok: true, payment_url });
         } catch (e) {
+          cleanupUploads(); // no record will be created — don't leave orphan files
           return res.status(502).json({ ok: false, message: e.message || "পেমেন্ট শুরু করা যায়নি।" });
         }
       }
+
+      // Manual mode → save the submission now, with its payment proof.
+      await HandAppointment.create({
+        name,
+        phone,
+        rightHandImage,
+        leftHandImage,
+        charge: page.charge,
+        paymentMethod,
+        transactionId,
+        senderNumber
+      });
 
       res.json({ ok: true, message: page.successMessage });
     } catch (err) {

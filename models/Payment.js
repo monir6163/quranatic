@@ -16,7 +16,13 @@ const PaymentSchema = new Schema(
       enum: ["HandAppointment", "Appointment", "Order"],
       required: true
     },
-    targetId: { type: Schema.Types.ObjectId, required: true },
+    // Set only once payment is verified and the real record is created. Null while
+    // PENDING/CANCELED/ERROR, so an abandoned payment never creates a business record.
+    targetId: { type: Schema.Types.ObjectId },
+
+    // The submission captured at charge time; applyPaid() builds the target record
+    // from this after a successful verify.
+    pendingData: { type: Schema.Types.Mixed },
 
     amount: { type: Number, required: true }, // expected amount (verification anchor)
     fullName: { type: String, default: "" },
