@@ -8,6 +8,7 @@ const Appointment = require("../models/Appointment");
 const HandAppointmentPage = require("../models/HandAppointmentPage");
 const HandAppointment = require("../models/HandAppointment");
 const upload = require("../middleware/upload");
+const { startCharge } = require("../lib/paymentFlow");
 
 function toList(raw) {
   return (raw || "")
@@ -103,6 +104,26 @@ router.post("/api/orders", async (req, res) => {
       deliveryLabel: deliveryLabel || "",
       total: cleanHadiya + cleanDeliveryCharge,
     });
+
+    // Online payment mode → open a gateway charge and hand the URL to the browser.
+    // COD (default) keeps the original inline-success behavior.
+    const content = await Content.getSingleton();
+    if (content.siteSettings.orderPaymentMode === "gateway" && order.total > 0) {
+      try {
+        const { payment_url } = await startCharge({
+          req,
+          targetType: "Order",
+          targetDoc: order,
+          amount: order.total,
+          fullName: cleanName,
+          phone: cleanPhone
+        });
+        return res.json({ ok: true, payment_url });
+      } catch (e) {
+        return res.status(502).json({ ok: false, message: e.message || "পেমেন্ট শুরু করা যায়নি।" });
+      }
+    }
+
     res.json({ ok: true, id: order._id });
   } catch (err) {
     console.error(err);
@@ -206,7 +227,35 @@ router.post("/api/appointments", async (req, res) => {
       });
     }
 
-    await Appointment.create({ language: lang, answers });
+    const appointment = await Appointment.create({ language: lang, answers });
+
+    // Online payment mode → charge form.charge and redirect to the gateway.
+    // When disabled (default) the flow is unchanged (inline success message).
+    if (form.paymentEnabled && form.charge > 0) {
+      const strAnswer = (a) => (a && typeof a.value === "string" ? a.value.trim() : "");
+      const telAns = answers.find((a) => a.type === "tel" && strAnswer(a));
+      const emailAns = answers.find((a) => a.type === "email" && strAnswer(a));
+      const nameAns =
+        answers.find((a) => a.type === "text" && /name/i.test(a.key) && strAnswer(a)) ||
+        answers.find((a) => a.type === "text" && strAnswer(a));
+      try {
+        const { payment_url } = await startCharge({
+          req,
+          targetType: "Appointment",
+          targetDoc: appointment,
+          amount: form.charge,
+          fullName: nameAns ? strAnswer(nameAns) : "",
+          email: emailAns ? strAnswer(emailAns) : "",
+          phone: telAns ? strAnswer(telAns) : ""
+        });
+        return res.json({ ok: true, payment_url });
+      } catch (e) {
+        return res
+          .status(502)
+          .json({ ok: false, message: e.message || t("পেমেন্ট শুরু করা যায়নি।", "Could not start payment.") });
+      }
+    }
+
     res.json({ ok: true, message: lang === "en" ? form.successEn : form.successBn });
   } catch (err) {
     console.error(err);
@@ -243,30 +292,52 @@ router.post("/api/hand-appointments", (req, res) => {
       const rightFile = req.files && req.files.rightHand && req.files.rightHand[0];
       const leftFile = req.files && req.files.leftHand && req.files.leftHand[0];
 
+      const gateway = page.paymentMode === "gateway";
+
       const errors = {};
       if (!name || name.length < 2) errors.name = "সঠিক নাম দিন।";
       if (!BD_PHONE_RE.test(phone)) errors.phone = "সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন।";
       if (!rightFile) errors.rightHand = "ডান হাতের ছবি আপলোড করুন।";
       if (!leftFile) errors.leftHand = "বাম হাতের ছবি আপলোড করুন।";
-      if (methods.length && !methods.includes(paymentMethod)) errors.paymentMethod = "পেমেন্ট মাধ্যম নির্বাচন করুন।";
-      if (!transactionId) errors.transactionId = "ট্রানজেকশন আইডি দিন।";
-      if (!BD_PHONE_RE.test(senderNumber)) errors.senderNumber = "সঠিক ১১ ডিজিটের নম্বর দিন।";
+      // Manual proof (method / TrxID / sender number) is only required when the gateway is off.
+      if (!gateway) {
+        if (methods.length && !methods.includes(paymentMethod)) errors.paymentMethod = "পেমেন্ট মাধ্যম নির্বাচন করুন।";
+        if (!transactionId) errors.transactionId = "ট্রানজেকশন আইডি দিন।";
+        if (!BD_PHONE_RE.test(senderNumber)) errors.senderNumber = "সঠিক ১১ ডিজিটের নম্বর দিন।";
+      }
 
       if (Object.keys(errors).length) {
         cleanupUploads();
         return res.status(400).json({ ok: false, message: "দয়া করে চিহ্নিত ঘরগুলো ঠিক করুন।", errors });
       }
 
-      await HandAppointment.create({
+      const submission = await HandAppointment.create({
         name,
         phone,
         rightHandImage: `/uploads/${rightFile.filename}`,
         leftHandImage: `/uploads/${leftFile.filename}`,
         charge: page.charge,
-        paymentMethod,
-        transactionId,
-        senderNumber
+        paymentMethod: gateway ? "" : paymentMethod,
+        transactionId: gateway ? "" : transactionId,
+        senderNumber: gateway ? "" : senderNumber
       });
+
+      // Gateway mode → open a charge and redirect; manual mode is unchanged.
+      if (gateway) {
+        try {
+          const { payment_url } = await startCharge({
+            req,
+            targetType: "HandAppointment",
+            targetDoc: submission,
+            amount: page.charge,
+            fullName: name,
+            phone
+          });
+          return res.json({ ok: true, payment_url });
+        } catch (e) {
+          return res.status(502).json({ ok: false, message: e.message || "পেমেন্ট শুরু করা যায়নি।" });
+        }
+      }
 
       res.json({ ok: true, message: page.successMessage });
     } catch (err) {

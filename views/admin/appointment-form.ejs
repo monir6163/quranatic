@@ -8,6 +8,20 @@
 
 <%- include('../partials/admin-flash') %>
 
+<form action="/admin/appointment-form/payment" method="POST" class="admin-card mt-6 max-w-2xl space-y-4">
+  <h2 class="font-display text-lg font-bold text-primary-800">💳 অনলাইন পেমেন্ট</h2>
+  <p class="text-sm text-ink/60">চালু করলে আবেদনকারী ফর্ম জমা দেওয়ার পর অনলাইন পেমেন্ট গেটওয়েতে (UddoktaPay) গিয়ে হাদিয়া পরিশোধ করবেন। বন্ধ থাকলে ফর্মটি আগের মতোই কাজ করবে (কোনো পেমেন্ট ছাড়াই)।</p>
+  <label class="flex items-center gap-3">
+    <input type="checkbox" name="paymentEnabled" value="1" <%= form.paymentEnabled ? 'checked' : '' %> class="h-5 w-5 accent-primary-600" />
+    <span class="text-sm font-semibold text-ink/80">অনলাইন পেমেন্ট চালু করুন</span>
+  </label>
+  <div class="max-w-xs">
+    <label class="admin-label">হাদিয়া / চার্জ (৳)</label>
+    <input type="number" name="charge" value="<%= form.charge %>" min="0" class="admin-input" />
+  </div>
+  <button type="submit" class="admin-btn">পেমেন্ট সেটিংস সংরক্ষণ করুন</button>
+</form>
+
 <form action="/admin/appointment-form" method="POST" class="js-builder-form mt-6 space-y-6">
 
   <!-- Page-level settings -->

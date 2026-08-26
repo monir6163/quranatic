@@ -17,7 +17,8 @@ const AnswerSchema = new Schema(
 const AppointmentSchema = new Schema(
   {
     language: { type: String, enum: ["bn", "en"], default: "bn" },
-    answers: { type: [AnswerSchema], default: [] }
+    answers: { type: [AnswerSchema], default: [] },
+    paid: { type: Boolean, default: false } // set true once an online payment is verified
   },
   { timestamps: true }
 );

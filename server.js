@@ -9,6 +9,7 @@ const methodOverride = require("method-override");
 const connectDB = require("./config/db");
 const publicRoutes = require("./routes/public");
 const adminRoutes = require("./routes/admin");
+const paymentRoutes = require("./routes/payment");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,6 +43,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/admin", adminRoutes);
+app.use("/payment", paymentRoutes);
 app.use("/", publicRoutes);
 
 // 404

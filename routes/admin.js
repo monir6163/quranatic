@@ -9,6 +9,8 @@ const AppointmentForm = require("../models/AppointmentForm");
 const Appointment = require("../models/Appointment");
 const HandAppointmentPage = require("../models/HandAppointmentPage");
 const HandAppointment = require("../models/HandAppointment");
+const Payment = require("../models/Payment");
+const paymentConfig = require("../config/payment");
 const upload = require("../middleware/upload");
 const { requireAdmin, redirectIfLoggedIn } = require("../middleware/auth");
 
@@ -212,6 +214,22 @@ router.post("/appointment-form", requireAdmin, async (req, res, next) => {
   }
 });
 
+/* Online-payment settings for the appointment form. Kept separate from the JSON
+   builder save so `paymentEnabled` / `charge` are never touched by it. */
+router.post("/appointment-form/payment", requireAdmin, async (req, res, next) => {
+  try {
+    const form = await AppointmentForm.getSingleton();
+    const on = req.body.paymentEnabled;
+    form.paymentEnabled = on === "1" || on === "on" || on === "true";
+    form.charge = Math.max(0, parseInt(req.body.charge, 10) || 0);
+    await form.save();
+    req.flash("success", "অ্যাপয়েন্টমেন্ট পেমেন্ট সেটিংস আপডেট হয়েছে।");
+    res.redirect("/admin/appointment-form");
+  } catch (err) {
+    next(err);
+  }
+});
+
 /* ---------------- APPOINTMENT SUBMISSIONS ---------------- */
 
 router.get("/appointments", requireAdmin, async (req, res, next) => {
@@ -275,6 +293,7 @@ router.post("/hand-appointment-page", requireAdmin, async (req, res, next) => {
       description: b.description,
       instructions: b.instructions,
       charge: Math.max(0, parseInt(b.charge, 10) || 0),
+      paymentMode: b.paymentMode === "gateway" ? "gateway" : "manual",
       paymentNumber: b.paymentNumber,
       paymentMethodsRaw: b.paymentMethodsRaw,
       paymentInstructions: b.paymentInstructions,
@@ -358,6 +377,34 @@ router.post("/hand-appointments/:id/delete", requireAdmin, async (req, res, next
   }
 });
 
+/* ---------------- PAYMENTS (gateway ledger) ---------------- */
+
+router.get("/payments", requireAdmin, async (req, res, next) => {
+  try {
+    const q = (req.query.q || "").trim();
+    const esc = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const filter = q
+      ? {
+          $or: [
+            { phone: { $regex: esc, $options: "i" } },
+            { fullName: { $regex: esc, $options: "i" } },
+            { invoiceId: { $regex: esc, $options: "i" } },
+            { transactionId: { $regex: esc, $options: "i" } }
+          ]
+        }
+      : {};
+    const payments = await Payment.find(filter).sort({ createdAt: -1 }).limit(300);
+    res.render("admin/payments", {
+      payments,
+      q,
+      active: "payments",
+      gateway: { configured: paymentConfig.isConfigured, mode: paymentConfig.mode }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 /* ---------------- SITE SETTINGS ---------------- */
 
 router.get("/settings", requireAdmin, async (req, res, next) => {
@@ -381,7 +428,8 @@ router.post("/settings", requireAdmin, upload.single("logo"), async (req, res, n
       whatsapp: b.whatsapp,
       duration: b.duration,
       ctaText: b.ctaText,
-      ctaLink: b.ctaLink
+      ctaLink: b.ctaLink,
+      orderPaymentMode: b.orderPaymentMode === "gateway" ? "gateway" : "cod"
     });
     if (req.file) {
       content.siteSettings.logo = `/uploads/${req.file.filename}`;

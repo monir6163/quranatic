@@ -539,6 +539,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           });
           if (!res.ok) throw new Error('Request failed');
 
+          const data = await res.json().catch(function () { return {}; });
+          // Gateway mode: server returns a payment URL — redirect to pay.
+          if (data.payment_url) {
+            window.location.href = data.payment_url;
+            return;
+          }
+
           successWrap.classList.remove('hidden');
           form.reset();
           updateTotal();

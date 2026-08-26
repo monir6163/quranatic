@@ -22,6 +22,7 @@
         action="/api/hand-appointments"
         method="POST"
         enctype="multipart/form-data"
+        data-payment-mode="<%= page.paymentMode %>"
         novalidate
       >
         <!-- Instructions -->
@@ -81,6 +82,12 @@
             <span class="font-display text-2xl font-extrabold">৳<%= page.charge %></span>
           </div>
 
+          <% if (page.paymentMode === 'gateway') { %>
+          <div class="mt-4 rounded-lg border border-primary-200 bg-primary-50/70 p-4 text-sm leading-relaxed text-ink/80">
+            <p class="flex items-center gap-2 font-semibold text-primary-800">🔒 নিরাপদ অনলাইন পেমেন্ট</p>
+            <p class="mt-1 text-ink/70">আবেদন জমা দেওয়ার পর আপনি সরাসরি বিকাশ / নগদ / কার্ডের মাধ্যমে নিরাপদে হাদিয়া পরিশোধ করতে পারবেন। পেমেন্ট সম্পন্ন হলে আপনার আবেদনটি স্বয়ংক্রিয়ভাবে নিশ্চিত হবে ইনশাআল্লাহ।</p>
+          </div>
+          <% } else { %>
           <% if (page.paymentNumber || page.paymentInstructions) { %>
           <div class="mt-4 rounded-lg border border-gold-200 bg-gold-50 p-4 text-sm leading-relaxed text-ink/80">
             <% if (page.paymentNumber) { %>
@@ -130,6 +137,7 @@
               </div>
             </div>
           </div>
+          <% } %>
         </section>
 
         <p class="js-hand-submit-error hidden rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-clay"></p>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>পেমেন্ট ফলাফল</title>
+  <link href="/css/output.css" rel="stylesheet" />
+</head>
+<body class="min-h-screen bg-canvas font-body text-ink">
+  <main class="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center px-4 py-10">
+    <%
+      var isSuccess = status === "success";
+      var isPending = status === "pending";
+    %>
+    <div class="w-full rounded-xl2 bg-panel p-8 text-center shadow-card">
+      <% if (isSuccess) { %>
+        <p class="font-display text-5xl">✅</p>
+        <h1 class="mt-3 font-display text-2xl font-extrabold text-primary-800">পেমেন্ট সফল হয়েছে</h1>
+        <p class="mt-2 text-sm leading-relaxed text-ink/70">
+          আপনার পেমেন্ট সফলভাবে গ্রহণ করা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব ইনশাআল্লাহ।
+        </p>
+      <% } else if (isPending) { %>
+        <p class="font-display text-5xl">⏳</p>
+        <h1 class="mt-3 font-display text-2xl font-extrabold text-gold-600">পেমেন্ট প্রক্রিয়াধীন</h1>
+        <p class="mt-2 text-sm leading-relaxed text-ink/70">
+          আপনার পেমেন্টটি এখনো নিশ্চিত হয়নি। নিশ্চিত হওয়ার পর আমরা স্বয়ংক্রিয়ভাবে তা যাচাই করে নেব। কিছুক্ষণ পর আবার দেখুন।
+        </p>
+      <% } else { %>
+        <p class="font-display text-5xl">⚠️</p>
+        <h1 class="mt-3 font-display text-2xl font-extrabold text-clay">পেমেন্ট সম্পন্ন হয়নি</h1>
+        <p class="mt-2 text-sm leading-relaxed text-ink/70">
+          দুঃখিত, আপনার পেমেন্টটি সম্পন্ন করা যায়নি। কোনো টাকা কেটে থাকলে তা ফেরত দেওয়া হবে। আবার চেষ্টা করুন।
+        </p>
+      <% } %>
+
+      <% if (record && record.amount) { %>
+        <div class="mx-auto mt-5 flex max-w-xs items-center justify-between rounded-xl bg-primary-50 px-5 py-3 text-sm">
+          <span class="font-semibold text-ink/60">পরিমাণ</span>
+          <span class="font-display text-lg font-extrabold text-primary-800">৳<%= record.amount %></span>
+        </div>
+      <% } %>
+
+      <a href="/" class="btn-primary mt-7 inline-block">হোমপেজে ফিরুন</a>
+    </div>
+  </main>
+</body>
+</html>

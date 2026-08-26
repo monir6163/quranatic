@@ -9,7 +9,8 @@ const OrderSchema = new Schema(
     hadiya: { type: Number, default: 0 },
     deliveryCharge: { type: Number, default: 0 },
     deliveryLabel: { type: String, default: "" },
-    total: { type: Number, default: 0 }
+    total: { type: Number, default: 0 },
+    paid: { type: Boolean, default: false } // set true once an online payment is verified
   },
   { timestamps: true }
 );

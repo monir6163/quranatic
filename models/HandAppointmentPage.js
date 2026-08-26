@@ -20,6 +20,10 @@ const HandAppointmentPageSchema = new Schema(
     // Charge / hadiya
     charge: { type: Number, default: 500 },
 
+    // Payment mode: 'manual' collects a bKash/Nagad proof (default, unchanged);
+    // 'gateway' redirects to the online payment gateway after the form is submitted.
+    paymentMode: { type: String, enum: ["manual", "gateway"], default: "manual" },
+
     // Payment (proof collected)
     paymentNumber: { type: String, default: "01820500346" },
     paymentMethodsRaw: { type: String, default: "বিকাশ\nনগদ" },

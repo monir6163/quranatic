@@ -6,6 +6,7 @@
   const form = wrap.querySelector(".js-hand-form");
   if (!form) return;
 
+  const gateway = form.dataset.paymentMode === "gateway";
   const BD_PHONE_RE = /^01[3-9]\d{8}$/;
 
   const submitBtn = form.querySelector(".js-hand-submit");
@@ -91,9 +92,12 @@
     if (!BD_PHONE_RE.test(phone)) fail("phone", "সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন।");
     if (!hasFile("rightHand")) fail("rightHand", "ডান হাতের ছবি আপলোড করুন।");
     if (!hasFile("leftHand")) fail("leftHand", "বাম হাতের ছবি আপলোড করুন।");
-    if (!paymentMethod) fail("paymentMethod", "পেমেন্ট মাধ্যম নির্বাচন করুন।");
-    if (!transactionId) fail("transactionId", "ট্রানজেকশন আইডি দিন।");
-    if (!BD_PHONE_RE.test(senderNumber)) fail("senderNumber", "সঠিক ১১ ডিজিটের নম্বর দিন।");
+    // Manual payment proof is only required when the online gateway is off.
+    if (!gateway) {
+      if (!paymentMethod) fail("paymentMethod", "পেমেন্ট মাধ্যম নির্বাচন করুন।");
+      if (!transactionId) fail("transactionId", "ট্রানজেকশন আইডি দিন।");
+      if (!BD_PHONE_RE.test(senderNumber)) fail("senderNumber", "সঠিক ১১ ডিজিটের নম্বর দিন।");
+    }
 
     return valid;
   }
@@ -136,6 +140,12 @@
         submitError.classList.remove("hidden");
         restore();
         scrollToFirstError();
+        return;
+      }
+
+      // Gateway mode: server returns a payment URL — go pay, don't show success yet.
+      if (data.payment_url) {
+        window.location.href = data.payment_url;
         return;
       }
 

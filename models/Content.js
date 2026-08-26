@@ -39,7 +39,10 @@ const ContentSchema = new Schema(
       duration: { type: String, default: "১০ দিন" },
       ctaText: { type: String, default: "অর্ডার করতে চাই →" },
       ctaLink: { type: String, default: "#order" },
-      faviconOrLogoNote: { type: String, default: "" }
+      faviconOrLogoNote: { type: String, default: "" },
+      // Order payment: 'cod' = cash on delivery (default, unchanged);
+      // 'gateway' = redirect to the online payment gateway after checkout.
+      orderPaymentMode: { type: String, enum: ["cod", "gateway"], default: "cod" }
     },
 
     // Hero section

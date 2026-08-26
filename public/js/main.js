@@ -217,6 +217,12 @@
         return;
       }
 
+      // Gateway mode: server returns a payment URL — redirect to pay.
+      if (data.payment_url) {
+        window.location.href = data.payment_url;
+        return;
+      }
+
       // Success: hide the form, show a thank-you message
       fieldsBox.classList.add("hidden");
       successBox.classList.remove("hidden");

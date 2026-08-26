@@ -50,6 +50,15 @@
   </div>
 
   <div>
+    <label class="admin-label">অর্ডার পেমেন্ট মোড</label>
+    <select name="orderPaymentMode" class="admin-input">
+      <option value="cod" <%= content.siteSettings.orderPaymentMode === 'cod' ? 'selected' : '' %>>ক্যাশ অন ডেলিভারি (ডিফল্ট)</option>
+      <option value="gateway" <%= content.siteSettings.orderPaymentMode === 'gateway' ? 'selected' : '' %>>অনলাইন পেমেন্ট গেটওয়ে (UddoktaPay)</option>
+    </select>
+    <p class="mt-1 text-xs text-ink/40">গেটওয়ে চালু থাকলে গ্রাহক অর্ডার কনফার্ম করার পর অনলাইনে মোট মূল্য পরিশোধ করবেন।</p>
+  </div>
+
+  <div>
     <label class="admin-label">লোগো</label>
     <% if (content.siteSettings.logo) { %>
       <img src="<%= content.siteSettings.logo %>" class="mb-2 h-14 w-14 rounded-lg object-cover ring-1 ring-primary-900/10" />

@@ -323,6 +323,13 @@ const AppointmentFormSchema = new Schema(
       default: "Thank you! Your application has been submitted successfully. We will contact you soon."
     },
     defaultLang: { type: String, enum: ["bn", "en"], default: "bn" },
+
+    // Online payment. Kept out of the JSON builder save (sanitizeDefinition never
+    // emits these keys), so they survive `form.set(sanitizeDefinition(...))` and
+    // are edited through their own admin route instead.
+    paymentEnabled: { type: Boolean, default: false },
+    charge: { type: Number, default: 500 },
+
     sections: { type: [SectionSchema], default: DEFAULT_SECTIONS }
   },
   { timestamps: true }

@@ -30,6 +30,14 @@
 
   <section class="admin-card space-y-5">
     <h2 class="font-display text-lg font-bold text-primary-800">হাদিয়া ও পেমেন্ট</h2>
+    <div>
+      <label class="admin-label">পেমেন্ট মোড</label>
+      <select name="paymentMode" class="admin-input">
+        <option value="manual" <%= page.paymentMode === 'manual' ? 'selected' : '' %>>ম্যানুয়াল প্রুফ (বিকাশ / নগদ — ডিফল্ট)</option>
+        <option value="gateway" <%= page.paymentMode === 'gateway' ? 'selected' : '' %>>অনলাইন পেমেন্ট গেটওয়ে (UddoktaPay)</option>
+      </select>
+      <p class="mt-1 text-xs text-ink/40">গেটওয়ে চালু থাকলে আবেদনকারী সাবমিটের পর সরাসরি অনলাইনে হাদিয়া পরিশোধ করবেন এবং পেমেন্ট যাচাই হলে আবেদন স্বয়ংক্রিয়ভাবে নিশ্চিত হবে। ম্যানুয়াল মোডে ট্রানজেকশন আইডি ও প্রেরকের নম্বর সংগ্রহ করা হবে।</p>
+    </div>
     <div class="grid gap-5 sm:grid-cols-2">
       <div>
         <label class="admin-label">হাদিয়া (৳)</label>
