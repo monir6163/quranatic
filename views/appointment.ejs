@@ -137,6 +137,25 @@
           </section>
           <% }); %>
 
+          <% if (form.paymentEnabled && form.charge > 0) { %>
+          <section class="admin-card">
+            <h2 class="mb-4 border-b border-primary-900/10 pb-2 font-display text-lg font-bold text-primary-800">
+              <span class="lang-bn">হাদিয়া ও পেমেন্ট</span><span class="lang-en">Hadiya &amp; Payment</span>
+            </h2>
+            <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-primary-600 px-5 py-4 text-white">
+              <span class="text-sm font-semibold opacity-90"><span class="lang-bn">প্রদেয় হাদিয়া</span><span class="lang-en">Payable Hadiya</span></span>
+              <span class="font-display text-2xl font-extrabold">৳<%= form.charge %></span>
+            </div>
+            <p class="mt-3 flex items-start gap-2 text-sm text-ink/60">
+              <span>🔒</span>
+              <span>
+                <span class="lang-bn">ফর্ম জমা দেওয়ার পর নিরাপদ অনলাইন পেমেন্টের মাধ্যমে হাদিয়া পরিশোধ করবেন।</span>
+                <span class="lang-en">You will pay the hadiya via secure online payment after submitting the form.</span>
+              </span>
+            </p>
+          </section>
+          <% } %>
+
           <!-- honeypot (bots) -->
           <input type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
