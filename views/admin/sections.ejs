@@ -1,0 +1,36 @@
+<%- include('../partials/admin-layout-top', { active }) %>
+
+<h1 class="font-display text-2xl font-bold text-primary-900">সেকশন কন্ট্রোল</h1>
+<p class="mt-1 text-sm text-ink/60">হোম পেজের কোন সেকশনগুলো দেখানো হবে তা এখান থেকে চালু / বন্ধ করুন। বন্ধ করা সেকশন লাইভ সাইটে দেখাবে না — তবে এর কন্টেন্ট মুছে যাবে না, আবার চালু করলেই ফিরে আসবে।</p>
+
+<%- include('../partials/admin-flash') %>
+
+<%
+  const sectionList = [
+    { key: 'hero',         icon: '🏷️', title: 'হিরো সেকশন',   desc: 'প্রধান শিরোনাম, বুলেট ও অর্ডার ফর্ম। ⚠️ বন্ধ করলে হোম পেজের উপরের অর্ডার ফর্মটিও আর দেখাবে না।' },
+    { key: 'video',        icon: '🎬', title: 'ভিডিও সেকশন',   desc: 'ইউটিউব ভিডিও / থাম্বনেইল অংশ।' },
+    { key: 'problems',     icon: '❗', title: 'সমস্যা সেকশন',   desc: '“কিছু একটা ঠিক নেই” কার্ডগুলো।' },
+    { key: 'solution',     icon: '✅', title: 'সমাধান সেকশন',   desc: 'গ্যালারি ছবি ও বিবরণ।' },
+    { key: 'whyUs',        icon: '⭐', title: 'কেন আলাদা',      desc: 'সুন্নাহভিত্তিক তুলনামূলক তালিকা সেকশন।' },
+    { key: 'faq',          icon: '❓', title: 'প্রশ্নোত্তর',     desc: 'সচরাচর জিজ্ঞাসা (FAQ) সেকশন।' },
+    { key: 'testimonials', icon: '💬', title: 'গ্রাহক রিভিউ',   desc: 'গ্রাহকদের মতামত স্লাইডার।' }
+  ];
+%>
+
+<form action="/admin/sections" method="POST" class="admin-card mt-6 max-w-2xl space-y-3">
+  <% sectionList.forEach(function (s) { %>
+  <label class="flex cursor-pointer items-start justify-between gap-4 rounded-lg border border-primary-900/15 bg-white px-4 py-3.5 transition hover:border-primary-400 has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50/50">
+    <span>
+      <span class="block font-semibold text-primary-900"><%= s.icon %> <%= s.title %></span>
+      <span class="mt-0.5 block text-xs leading-relaxed text-ink/50"><%= s.desc %></span>
+    </span>
+    <input type="checkbox" name="<%= s.key %>" <%= content.sections[s.key] ? 'checked' : '' %> class="mt-1 h-5 w-5 flex-none accent-primary-600" />
+  </label>
+  <% }); %>
+
+  <div class="pt-2">
+    <button type="submit" class="admin-btn">সংরক্ষণ করুন</button>
+  </div>
+</form>
+
+<%- include('../partials/admin-layout-bottom') %>

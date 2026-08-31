@@ -45,6 +45,19 @@ const ContentSchema = new Schema(
       orderPaymentMode: { type: String, enum: ["cod", "gateway"], default: "cod" }
     },
 
+    // Home page section visibility (show / hide). All default true, so existing
+    // sites render exactly as before until an admin turns a section off. Hiding a
+    // section never deletes its content — it just skips rendering it on the home page.
+    sections: {
+      hero: { type: Boolean, default: true },
+      video: { type: Boolean, default: true },
+      problems: { type: Boolean, default: true },
+      solution: { type: Boolean, default: true },
+      whyUs: { type: Boolean, default: true },
+      faq: { type: Boolean, default: true },
+      testimonials: { type: Boolean, default: true }
+    },
+
     // Hero section
     hero: {
       eyebrow: { type: String, default: "কুরআন সুন্নাহভিত্তিক — শরীয়াহসম্মত চিকিৎসা" },

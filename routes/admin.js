@@ -442,6 +442,38 @@ router.post("/settings", requireAdmin, upload.single("logo"), async (req, res, n
   }
 });
 
+/* ---------------- HOME SECTIONS (show / hide) ---------------- */
+
+// Keys must match the `sections` flags in the Content model and the
+// `content.sections.*` checks in views/index.ejs.
+const HOME_SECTIONS = ["hero", "video", "problems", "solution", "whyUs", "faq", "testimonials"];
+
+router.get("/sections", requireAdmin, async (req, res, next) => {
+  try {
+    const content = await Content.getSingleton();
+    res.render("admin/sections", { content, active: "sections" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/sections", requireAdmin, async (req, res, next) => {
+  try {
+    const content = await Content.getSingleton();
+    // Unchecked checkboxes are simply absent from the body, so an explicit
+    // presence check per key is what toggles a section off.
+    HOME_SECTIONS.forEach((key) => {
+      const v = req.body[key];
+      content.sections[key] = v === "on" || v === "1" || v === "true";
+    });
+    await content.save();
+    req.flash("success", "সেকশন দৃশ্যমানতা আপডেট হয়েছে।");
+    res.redirect("/admin/sections");
+  } catch (err) {
+    next(err);
+  }
+});
+
 /* ---------------- HERO ---------------- */
 
 router.get("/hero", requireAdmin, async (req, res, next) => {

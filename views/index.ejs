@@ -43,6 +43,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <%- include('partials/site-header') %>
 
   <!-- ================= HERO ================= -->
+  <% if (content.sections.hero) { %>
   <section id="top" class="relative overflow-hidden pb-16 pt-14 md:pb-24 md:pt-20">
     <div class="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-primary-200/40 blur-3xl"></div>
     <div class="pointer-events-none absolute -right-16 top-40 h-64 w-64 animate-floatSlow rounded-full bg-gold-200/40 blur-3xl"></div>
@@ -214,8 +215,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </form>
     </div>
   </section>
+  <% } %>
 
   <!-- ================= VIDEO SECTION (16:9) ================= -->
+  <% if (content.sections.video) { %>
   <%
     function getYouTubeEmbedUrl(url) {
       if (!url) return null;
@@ -261,8 +264,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
   </section>
+  <% } %>
 
   <!-- ================= PROBLEMS ================= -->
+  <% if (content.sections.problems) { %>
   <section id="problems" class="bg-white py-16 md:py-24">
     <div class="mx-auto max-w-6xl px-5">
       <div class="reveal mx-auto max-w-2xl text-center">
@@ -280,8 +285,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
   </section>
+  <% } %>
 
   <!-- ================= SOLUTION ================= -->
+  <% if (content.sections.solution) { %>
   <section id="solution" class="py-16 md:py-24">
     <div class="mx-auto max-w-6xl px-5">
       <div class="reveal mx-auto max-w-2xl text-center">
@@ -322,8 +329,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
   </section>
+  <% } %>
 
   <!-- ================= WHY US ================= -->
+  <% if (content.sections.whyUs) { %>
   <section class="bg-primary-900 py-16 text-white md:py-24">
     <div class="mx-auto max-w-6xl px-5">
       <div class="reveal mx-auto max-w-2xl text-center">
@@ -366,8 +375,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
   </section>
+  <% } %>
 
   <!-- ================= FAQ ================= -->
+  <% if (content.sections.faq) { %>
   <section id="faq" class="bg-white py-16 md:py-24">
     <div class="mx-auto max-w-6xl px-5">
       <div class="reveal mx-auto max-w-2xl text-center">
@@ -388,8 +399,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
   </section>
+  <% } %>
 
   <!-- ================= TESTIMONIALS ================= -->
+  <% if (content.sections.testimonials) { %>
   <section id="testimonials" class="bg-canvas py-16 md:py-24">
     <div class="mx-auto max-w-4xl px-5">
       <div class="reveal text-center">
@@ -432,6 +445,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <% } %>
     </div>
   </section>
+  <% } %>
 
   <%- include('partials/site-footer') %>
 
