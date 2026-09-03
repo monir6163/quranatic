@@ -93,7 +93,7 @@ router.post("/api/orders", async (req, res) => {
     // test er jonno 5 tk hobe
     const cleanHadiya = Math.max(0, parseInt(hadiya, 10) || 0);
     const cleanDeliveryCharge = Math.max(0, parseInt(deliveryCharge, 10) || 0);
-    if (![5, 10].includes(cleanDeliveryCharge)) {
+    if (![70, 130].includes(cleanDeliveryCharge)) {
       return res
         .status(400)
         .json({ ok: false, message: "সঠিক ডেলিভারি এলাকা নির্বাচন করুন।" });
